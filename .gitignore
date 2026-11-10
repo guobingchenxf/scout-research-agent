@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Corpus payloads (keep manifests and small fixtures)
+corpus/raw/*
+corpus/index/*
+!corpus/raw/.gitkeep
+!corpus/index/.gitkeep
+!corpus/manifest.json
+
+# Runtime data
+data/
+runs/
+*.sqlite
+*.sqlite3
+*.db
+
+# Sandbox workdirs
+sandbox/
+tmp/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/*.tsbuildinfo
+
+# Reports and artifacts
+reports/*
+!reports/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
