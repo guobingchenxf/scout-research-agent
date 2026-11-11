@@ -16,22 +16,22 @@ htmlcov/
 !.env.example
 
 # Corpus payloads (keep manifests and small fixtures)
-corpus/raw/*
-corpus/index/*
-!corpus/raw/.gitkeep
-!corpus/index/.gitkeep
-!corpus/manifest.json
+/corpus/raw/*
+/corpus/index/*
+!/corpus/raw/.gitkeep
+!/corpus/index/.gitkeep
+!/corpus/manifest.json
 
 # Runtime data
-data/
-runs/
+/data/
+/runs/
 *.sqlite
 *.sqlite3
 *.db
 
-# Sandbox workdirs
-sandbox/
-tmp/
+# Sandbox workdirs (root only — backend/src/scout/sandbox is source)
+/sandbox/
+/tmp/
 
 # Frontend
 frontend/node_modules/
@@ -40,8 +40,8 @@ frontend/.vite/
 frontend/*.tsbuildinfo
 
 # Reports and artifacts
-reports/*
-!reports/.gitkeep
+/reports/*
+!/reports/.gitkeep
 
 # OS / editor
 .DS_Store
