@@ -125,3 +125,19 @@ python scripts/capture_demo.py --base-url http://127.0.0.1:8000
 
 产物在 `docs/assets/`（截图 + `demo.webm`）。mock planner 不调用外网，
 可离线复现。
+
+## P1 新增：深链、e2e、memory
+
+- 每个视图都有独立 URL，可直接打开或分享：
+  - `/task`
+  - `/runs/<run_id>`
+  - `/runs/<run_id>/evidence`
+  - `/runs/<run_id>/report`
+  - `/runs/<run_id>/approvals`
+  - `/eval`
+  - `/sources`
+- 前端有 error boundary 和 404 页；后端对未知前端路径返回 `index.html`。
+- e2e：`python scripts/e2e_frontend.py --base-url http://127.0.0.1:8000`
+  （需要后端 + 构建后的前端）。
+- Engram memory：设置 `SCOUT_ENGRAM_URL` 后，run 开始会检索长期记忆，
+  finished 后写入一条 episodic memory；启动与验证见 `docs/MEMORY.md`。

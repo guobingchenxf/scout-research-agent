@@ -7,6 +7,7 @@ import uuid
 from typing import Any
 
 from ..config import ScoutConfig
+from ..memory import MemoryClient
 from ..models import (
     Evidence,
     Gap,
@@ -81,6 +82,7 @@ class AgentLoop:
         *,
         synthesizer: Synthesizer | None = None,
         trace_directory: str | None = None,
+        memory: MemoryClient | None = None,
     ) -> None:
         self.config = config
         self.store = store
@@ -89,6 +91,7 @@ class AgentLoop:
         self.reflector = reflector
         self.synthesizer = synthesizer
         self.trace_directory = trace_directory
+        self.memory = memory
 
     def run(
         self,
@@ -112,6 +115,19 @@ class AgentLoop:
             )
         trace = Trace(self.store, run_id, directory=self.trace_directory)
         trace.emit("run_started", {"question": question, "constraints": state.constraints})
+
+        if self.memory is not None:
+            try:
+                state.memory_context = self.memory.search_context(question)
+                trace.emit(
+                    "memory_search",
+                    {
+                        "chars": len(state.memory_context),
+                        "context": state.memory_context[:1200],
+                    },
+                )
+            except Exception as exc:  # noqa: BLE001 - memory must not fail a run
+                trace.emit("memory_error", {"stage": "search", "error": str(exc)})
 
         report: Report | None = None
         status = RunStatus.RUNNING
@@ -263,6 +279,31 @@ class AgentLoop:
             },
             error=error,
         )
+
+        if (
+            self.memory is not None
+            and report is not None
+            and status == RunStatus.FINISHED
+        ):
+            try:
+                sources: list[str] = []
+                for citation in report.citations:
+                    if citation.doc_id not in sources:
+                        sources.append(citation.doc_id)
+                memory_id = self.memory.write_run(
+                    question=question,
+                    answer=report.answer,
+                    run_id=run_id,
+                    sources=sources,
+                    status=status.value,
+                )
+                trace.emit(
+                    "memory_write",
+                    {"memory_id": memory_id, "sources": sources[:8]},
+                )
+            except Exception as exc:  # noqa: BLE001 - memory must not fail a run
+                trace.emit("memory_error", {"stage": "write", "error": str(exc)})
+
         return RunResult(
             run_id=run_id,
             status=status,

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from typing import Any
 
 from ..config import ScoutConfig
@@ -12,6 +13,7 @@ from ..models import (
     SourceDocument,
     SourceType,
     TrustLevel,
+    utc_now,
 )
 from ..policy.allowlist import AllowlistPolicy
 from .api_sources import ApiSource, default_api_sources
@@ -63,9 +65,14 @@ class AcquisitionRouter:
                 )
 
         if self.mcp_client is not None:
-            for tool in ("web_search", "search"):
+            attempts = (
+                ("web_search", {"query": query, "k": k}),
+                ("search", {"query": query, "k": k}),
+                ("search_papers", {"query": query, "max_results": k}),
+            )
+            for tool, arguments in attempts:
                 try:
-                    output = self.mcp_client.call_tool(tool, {"query": query, "k": k})
+                    output = self.mcp_client.call_tool(tool, arguments)
                 except Exception as exc:  # noqa: BLE001
                     errors.append(f"mcp:{tool}: {exc}")
                     continue
@@ -186,6 +193,11 @@ class AcquisitionRouter:
         if isinstance(output, SourceDocument):
             return [output]
         if isinstance(output, dict):
+            if output.get("isError"):
+                return []
+            arxiv_documents = self._documents_from_arxiv(output)
+            if arxiv_documents:
+                return arxiv_documents
             if "documents" in output and isinstance(output["documents"], list):
                 return [
                     SourceDocument.model_validate(item)
@@ -221,4 +233,57 @@ class AcquisitionRouter:
                     self._documents_from_mcp(item, fallback_url=fallback_url)
                 )
             return documents
+        return []
+
+    def _documents_from_arxiv(self, output: dict[str, Any]) -> list[SourceDocument]:
+        """Parse the JSON text returned by the arXiv MCP search server."""
+        content = output.get("content")
+        if not isinstance(content, list):
+            return []
+        for item in content:
+            if not isinstance(item, dict) or item.get("type") != "text":
+                continue
+            try:
+                payload = json.loads(str(item.get("text") or ""))
+            except json.JSONDecodeError:
+                continue
+            papers = payload.get("papers") if isinstance(payload, dict) else None
+            if not isinstance(papers, list):
+                continue
+            documents: list[SourceDocument] = []
+            for paper in papers:
+                if not isinstance(paper, dict):
+                    continue
+                paper_id = str(paper.get("id") or paper.get("versioned_id") or "")
+                if not paper_id:
+                    continue
+                title = str(paper.get("title") or paper_id)
+                abstract = str(paper.get("abstract") or "")
+                authors = ", ".join(str(author) for author in paper.get("authors") or [])
+                url = f"https://arxiv.org/abs/{paper_id}"
+                body = (
+                    f"# {title}\n\nSource: {url}\n\n"
+                    f"Authors: {authors}\n\n{abstract}\n"
+                )
+                documents.append(
+                    SourceDocument(
+                        id=f"arxiv:{paper_id}",
+                        title=title,
+                        url=url,
+                        source_type=SourceType.PAPER,
+                        trust=TrustLevel.PRIMARY,
+                        retrieval_method=RetrievalMethod.MCP,
+                        fetched_at=utc_now(),
+                        content_hash=_hash(body),
+                        text=body,
+                        metadata={
+                            "arxiv_id": paper_id,
+                            "authors": paper.get("authors") or [],
+                            "published": paper.get("published"),
+                            "mcp_tool": "search_papers",
+                        },
+                    )
+                )
+            if documents:
+                return documents
         return []

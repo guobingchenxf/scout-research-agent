@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from fastapi.testclient import TestClient
 
 from scout.api import create_app
@@ -47,6 +49,22 @@ def test_health_and_run_endpoints(tmp_path) -> None:
         trace = client.get(f"/v1/runs/{payload['run_id']}/trace/view")
         assert trace.status_code == 200
         assert "Scout trace" in trace.text or "run" in trace.text
+
+
+def test_eval_summaries_skips_details_files(tmp_path) -> None:
+    reports = tmp_path / "reports"
+    reports.mkdir()
+    (reports / "eval_ok.json").write_text(
+        json.dumps({"summary": {"tasks": 1}}), encoding="utf-8"
+    )
+    (reports / "eval_ok.details.json").write_text(
+        json.dumps([{"task_id": "x"}]), encoding="utf-8"
+    )
+    app = create_app(_config(tmp_path, reports_dir=reports))
+    with TestClient(app) as client:
+        response = client.get("/v1/eval/summaries")
+        assert response.status_code == 200
+        assert [item["file"] for item in response.json()] == ["eval_ok.json"]
 
 
 def test_auth_required(tmp_path) -> None:

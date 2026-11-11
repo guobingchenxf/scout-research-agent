@@ -139,3 +139,46 @@ def test_search_prefers_api_then_mcp(sample_documents) -> None:
     result = mcp_router.search("q")
     assert result.method == RetrievalMethod.MCP
     assert result.documents
+
+
+def test_search_parses_arxiv_mcp_papers() -> None:
+    payload = {
+        "content": [
+            {
+                "type": "text",
+                "text": (
+                    '{"papers": [{"id": "2309.06180", "title": "PagedAttention", '
+                    '"authors": ["Woosuk Kwon"], "abstract": "KV cache paging."}]}'
+                ),
+            }
+        ],
+        "isError": False,
+    }
+    router = AcquisitionRouter(
+        _config(),
+        api_sources=[FakeApiSource(search_documents=[])],
+        mcp_client=MockMcpClient({"search_papers": lambda args: payload}),
+    )
+    result = router.search("PagedAttention", k=3)
+    assert result.method == RetrievalMethod.MCP
+    assert result.documents[0].id == "arxiv:2309.06180"
+    assert result.documents[0].source_type.value == "paper"
+    assert "PagedAttention" in result.documents[0].text
+
+
+def test_mcp_error_payload_is_not_a_document() -> None:
+    router = AcquisitionRouter(
+        _config(),
+        api_sources=[FakeApiSource(search_documents=[])],
+        mcp_client=MockMcpClient(
+            {
+                "search_papers": lambda args: {
+                    "content": [{"type": "text", "text": "Error: Unknown tool"}],
+                    "isError": True,
+                }
+            }
+        ),
+    )
+    result = router.search("q", k=1)
+    assert result.documents == []
+    assert result.error

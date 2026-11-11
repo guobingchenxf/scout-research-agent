@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { createRun, getHealth, getRun, openEventStream } from "./api";
 import type { EventRecord, Planner, RunRecord } from "./types";
 import ApprovalsView from "./components/ApprovalsView";
@@ -23,14 +24,32 @@ const NAV: Array<{ key: View; label: string; requiresRun?: boolean }> = [
   { key: "sources", label: "来源/策略" },
 ];
 
-const INITIAL_PARAMS = new URLSearchParams(window.location.search);
+const LEGACY_PARAMS = new URLSearchParams(window.location.search);
+
+interface RouteState {
+  view: View | null;
+  runId: string | null;
+}
+
+function parseRoute(pathname: string): RouteState {
+  const path = pathname.replace(/\/+$/, "") || "/";
+  const runMatch = path.match(/^\/runs\/([^/]+)(?:\/(evidence|report|approvals))?$/);
+  if (runMatch) {
+    return {
+      view: (runMatch[2] as View | undefined) ?? "run",
+      runId: decodeURIComponent(runMatch[1]),
+    };
+  }
+  if (path === "/" || path === "/task") return { view: "task", runId: null };
+  if (path === "/eval") return { view: "eval", runId: null };
+  if (path === "/sources") return { view: "sources", runId: null };
+  return { view: null, runId: null };
+}
 
 export default function App() {
-  const initialView = INITIAL_PARAMS.get("view") as View | null;
-  const [view, setView] = useState<View>(
-    initialView && NAV.some((item) => item.key === initialView) ? initialView : "task",
-  );
-  const [runId, setRunId] = useState<string | null>(INITIAL_PARAMS.get("run"));
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { view, runId } = parseRoute(location.pathname);
   const [run, setRun] = useState<RunRecord | null>(null);
   const [events, setEvents] = useState<EventRecord[]>([]);
   const [busy, setBusy] = useState(false);
@@ -44,7 +63,25 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!runId) return;
+    const legacyView = LEGACY_PARAMS.get("view");
+    const legacyRun = LEGACY_PARAMS.get("run");
+    if (!legacyView && !legacyRun) return;
+    const section =
+      legacyView && legacyView !== "run" && legacyView !== "task" ? legacyView : "";
+    const target = legacyRun
+      ? `/runs/${legacyRun}${section ? `/${section}` : ""}`
+      : legacyView && legacyView !== "task"
+        ? `/${legacyView}`
+        : "/task";
+    navigate(target, { replace: true });
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!runId) {
+      setRun(null);
+      setEvents([]);
+      return;
+    }
     setEvents([]);
     let stopped = false;
     const stop = openEventStream(
@@ -92,8 +129,7 @@ export default function App() {
       if (!result.run_id) {
         throw new Error("后端没有返回 run_id");
       }
-      setRunId(result.run_id);
-      setView("run");
+      navigate(`/runs/${result.run_id}`);
     } catch (reason) {
       setError((reason as Error).message);
     } finally {
@@ -106,6 +142,13 @@ export default function App() {
     getRun(runId)
       .then(setRun)
       .catch((reason: Error) => setError(reason.message));
+  }
+
+  function go(key: View) {
+    if (key === "task") navigate("/task");
+    else if (key === "eval") navigate("/eval");
+    else if (key === "sources") navigate("/sources");
+    else if (runId) navigate(key === "run" ? `/runs/${runId}` : `/runs/${runId}/${key}`);
   }
 
   const docs = Number(health?.documents ?? 0);
@@ -127,7 +170,7 @@ export default function App() {
               key={item.key}
               className={view === item.key ? "active" : ""}
               disabled={Boolean(item.requiresRun && !runId)}
-              onClick={() => setView(item.key)}
+              onClick={() => go(item.key)}
             >
               {item.label}
             </button>
@@ -173,6 +216,20 @@ export default function App() {
         {view === "eval" ? <EvalDashboard /> : null}
         {view === "approvals" ? <ApprovalsView runId={runId ?? undefined} /> : null}
         {view === "sources" ? <SourcesView /> : null}
+        {view === null ? (
+          <section className="view">
+            <header className="view-head">
+              <div>
+                <p className="eyebrow">404</p>
+                <h1>页面不存在</h1>
+                <p className="muted">链接可能已失效，或者 run id 不正确。</p>
+              </div>
+            </header>
+            <button type="button" className="button primary" onClick={() => navigate("/task")}>
+              回到任务页
+            </button>
+          </section>
+        ) : null}
       </main>
     </div>
   );

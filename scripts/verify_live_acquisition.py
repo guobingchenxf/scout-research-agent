@@ -36,7 +36,10 @@ def _describe(result: Any, elapsed_ms: float) -> dict[str, Any]:
         "method": result.method.value if result.method else None,
         "ok": document is not None,
         "error": result.error,
+        "docs": len(result.documents),
         "doc_id": document.id if document else None,
+        "doc_ids": [item.id for item in result.documents],
+        "titles": [item.title for item in result.documents],
         "title": document.title if document else None,
         "chars": len(document.text) if document else 0,
         "preview": (document.text[:180].replace("\n", " ") if document else ""),
@@ -51,6 +54,22 @@ def check_mcp(config: ScoutConfig, url: str, timeout: float) -> dict[str, Any]:
     try:
         result = router.read(url)
         return {**_describe(result, (time.perf_counter() - started) * 1000), "path": "mcp"}
+    finally:
+        router.close()
+
+
+def check_mcp_search(
+    config: ScoutConfig, query: str, k: int, timeout: float
+) -> dict[str, Any]:
+    client = StdioMcpClient("uvx", ["arxiv-mcp-server"], timeout=timeout).start()
+    router = AcquisitionRouter(config, api_sources=[], mcp_client=client)
+    started = time.perf_counter()
+    try:
+        result = router.search(query, k=k)
+        return {
+            **_describe(result, (time.perf_counter() - started) * 1000),
+            "path": "mcp-search",
+        }
     finally:
         router.close()
 
@@ -108,6 +127,7 @@ def check_gui_denied(config: ScoutConfig) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--mcp-url", default="https://docs.vllm.ai/en/latest/")
+    parser.add_argument("--mcp-query", default="PagedAttention KV cache")
     parser.add_argument("--rpa-url", default="https://github.com/vllm-project/vllm")
     parser.add_argument("--gui-url", default="https://docs.vllm.ai/en/latest/")
     parser.add_argument("--gui-channel", default="msedge")
@@ -121,6 +141,12 @@ def main() -> int:
 
     for name, fn in (
         ("mcp", lambda: check_mcp(config, args.mcp_url, args.mcp_timeout)),
+        (
+            "mcp-search",
+            lambda: check_mcp_search(
+                config, args.mcp_query, 3, args.mcp_timeout
+            ),
+        ),
         ("rpa", lambda: check_rpa(config, args.rpa_url)),
         ("gui", lambda: check_gui(config, args.gui_url, args.gui_channel, args.gui_timeout_ms)),
         ("gui-deny", lambda: check_gui_denied(config)),
@@ -140,13 +166,14 @@ def main() -> int:
         )
 
     print()
-    print("| path | ok | method | title | chars | elapsed ms |")
-    print("|---|---|---|---|---:|---:|")
+    print("| path | ok | method | docs | title | chars | elapsed ms |")
+    print("|---|---|---|---:|---|---:|---:|")
     for result in results:
         title = (result.get("title") or "").replace("|", "\\|")[:60]
         print(
             f"| {result['check']} | {result.get('ok')} | {result.get('method') or '-'} "
-            f"| {title or '-'} | {result.get('chars', 0)} | {result.get('elapsed_ms', '-')} |"
+            f"| {result.get('docs', 0)} | {title or '-'} | {result.get('chars', 0)} "
+            f"| {result.get('elapsed_ms', '-')} |"
         )
 
     if args.json:

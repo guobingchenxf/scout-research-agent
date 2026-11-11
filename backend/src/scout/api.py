@@ -20,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .acquisition.factory import build_acquisition_router
 from .agent.loop import AgentLoop
@@ -31,6 +32,7 @@ from .audit import AuditLogger
 from .config import ScoutConfig
 from .hitl import ApprovalGate
 from .llm import LLMClient
+from .memory import build_memory_client
 from .models import Run, RunStatus
 from .policy.allowlist import AllowlistPolicy
 from .policy.capability import PolicyEngine
@@ -40,6 +42,20 @@ from .retrieval import build_index_from_store
 from .sandbox.python_sandbox import make_sandbox
 from .storage import SQLiteStore
 from .viewer import render_trace_html
+
+
+class SPAStaticFiles(StaticFiles):
+    """Serve the SPA for client-side routes, but not for unknown API paths."""
+
+    async def get_response(self, path: str, scope: Any) -> Any:
+        try:
+            return await super().get_response(path, scope)
+        except StarletteHTTPException as exc:
+            if exc.status_code == 404 and not path.startswith(
+                ("v1/", "health", "assets/")
+            ):
+                return await super().get_response("index.html", scope)
+            raise
 
 
 class RunRequest(BaseModel):
@@ -65,6 +81,7 @@ def create_app(config: ScoutConfig | None = None) -> FastAPI:
         embedding_dim=config.embedding_dim,
     )
     router = build_acquisition_router(config)
+    memory = build_memory_client(config)
     reflector = Reflector(store)
     allowlist = AllowlistPolicy(
         config.source_allowlist,
@@ -93,6 +110,8 @@ def create_app(config: ScoutConfig | None = None) -> FastAPI:
             yield
         finally:
             router.close()
+            if memory is not None:
+                memory.close()
             store.close()
 
     app = FastAPI(title="Scout", version="0.1.0", lifespan=lifespan)
@@ -100,6 +119,7 @@ def create_app(config: ScoutConfig | None = None) -> FastAPI:
     app.state.store = store
     app.state.index = index
     app.state.router = router
+    app.state.memory = memory
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -164,6 +184,7 @@ def create_app(config: ScoutConfig | None = None) -> FastAPI:
             reflector,
             synthesizer=Synthesizer(llm, config.model_planner) if llm is not None else None,
             trace_directory=str(config.db_path.parent / "traces"),
+            memory=memory,
         )
         return loop, llm
 
@@ -279,9 +300,13 @@ def create_app(config: ScoutConfig | None = None) -> FastAPI:
     def eval_summaries() -> list[dict[str, Any]]:
         results: list[dict[str, Any]] = []
         for path in sorted(config.reports_dir.glob("eval_*.json")):
+            if path.name.endswith(".details.json"):
+                continue
             try:
                 payload = json.loads(path.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError):
+                continue
+            if not isinstance(payload, dict):
                 continue
             payload["file"] = path.name
             results.append(payload)
@@ -304,7 +329,11 @@ def create_app(config: ScoutConfig | None = None) -> FastAPI:
         }
 
     if config.static_dir.exists():
-        app.mount("/", StaticFiles(directory=str(config.static_dir), html=True), name="ui")
+        app.mount(
+            "/",
+            SPAStaticFiles(directory=str(config.static_dir), html=True),
+            name="ui",
+        )
 
     return app
 

@@ -157,6 +157,15 @@ class ScoutConfig:
     gui_allowed_hosts: tuple[str, ...] = ()
     gui_browser_channel: str = ""
 
+    # Optional Engram memory layer. Empty URL keeps memory disabled.
+    engram_url: str = ""
+    engram_api_key: str = ""
+    engram_user_id: str = "scout"
+    engram_tenant_id: str = ""
+    engram_top_k: int = 5
+    engram_token_budget: int = 800
+    engram_timeout_seconds: float = 10.0
+
     @classmethod
     def from_env(cls, env_file: Path | None = None) -> ScoutConfig:
         load_dotenv(env_file or PROJECT_ROOT / ".env", override=False)
@@ -212,6 +221,13 @@ class ScoutConfig:
             gui_enabled=_env_bool("SCOUT_GUI_ENABLED", False),
             gui_allowed_hosts=_split_csv(_env_str("SCOUT_GUI_ALLOWED_HOSTS")),
             gui_browser_channel=_env_str("SCOUT_GUI_BROWSER_CHANNEL"),
+            engram_url=_env_str("SCOUT_ENGRAM_URL"),
+            engram_api_key=_env_str("SCOUT_ENGRAM_API_KEY"),
+            engram_user_id=_env_str("SCOUT_ENGRAM_USER_ID", "scout"),
+            engram_tenant_id=_env_str("SCOUT_ENGRAM_TENANT_ID"),
+            engram_top_k=_env_int("SCOUT_ENGRAM_TOP_K", 5),
+            engram_token_budget=_env_int("SCOUT_ENGRAM_TOKEN_BUDGET", 800),
+            engram_timeout_seconds=_env_float("SCOUT_ENGRAM_TIMEOUT_SECONDS", 10.0),
         )
 
     def with_overrides(self, **kwargs: object) -> ScoutConfig:
@@ -249,6 +265,7 @@ class ScoutConfig:
             "mcp_enabled": bool(self.mcp_command),
             "rpa_enabled": self.rpa_enabled,
             "gui_enabled": self.gui_enabled,
+            "engram_enabled": bool(self.engram_url),
             "require_auth": self.require_auth,
             "api_key_configured": bool(self.deepseek_api_key),
         }

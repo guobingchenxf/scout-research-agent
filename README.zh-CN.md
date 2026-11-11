@@ -2,7 +2,7 @@
 
 **一个 citation-first 的 AI 技术调研 Agent。**
 
-[![tests](https://img.shields.io/badge/tests-107%20passing-2ea44f)](#测试)
+[![tests](https://img.shields.io/badge/tests-116%20passing-2ea44f)](#测试)
 [![python](https://img.shields.io/badge/python-3.10-3776AB)](#快速开始)
 [![fastapi](https://img.shields.io/badge/FastAPI-0.162-009688)](#架构)
 [![react](https://img.shields.io/badge/React-19-61DAFB)](#前端)
@@ -21,7 +21,7 @@ Scout 在一个冻结的 AI / Agent / RecSys 语料上回答技术调研问题�
 
 > 3 分钟演示脚本和讲解词：[`docs/DEMO.md`](docs/DEMO.md)。
 
-> **状态：** 107 tests · 36 security cases · 50 题评测 · Docker 一条命令部署。
+> **状态：** 116 tests · 36 security cases · 50 题评测 · Docker 一条命令部署。
 > Full 50 live（DeepSeek flash）：**Scout 28/50（56%）vs single-shot RAG 18/50（36%）**。
 > 交付记录见 [`docs/PHASES.md`](docs/PHASES.md)。
 
@@ -133,6 +133,7 @@ API adapter → MCP tool → RPA workflow → read-only GUI fallback
 
 - FastAPI 后端：async run + SSE；
 - React + Vite + TypeScript 前端：任务、时间线、证据板、报告、评测面板、审批、来源/策略；
+- URL 路由与深链（`/runs/:id/report`）、error boundary、Playwright e2e smoke；
 - SQLite 持久化、可回放 trace、Docker Compose 部署。
 
 ---
@@ -171,7 +172,7 @@ Runtime 不依赖框架：loop、tools、evidence board、scheduler、evaluator 
 
 - **Engram** 是可信长期记忆层；
 - **Scout** 是可信证据与研究层；
-- Scout 可选使用 Engram 存项目记忆、用户偏好和 signed provenance；核心评测不依赖 Engram。
+- Scout 在规划前读取相关记忆，每次 finished run 后通过 Engram HTTP API 写入一条 episodic memory；核心评测不依赖 Engram。见 [`docs/MEMORY.md`](docs/MEMORY.md)。
 
 Scout 也是 Engram roadmap 里的 P0 integration：一个使用 memory layer 的 Deep Research Agent。
 
@@ -313,6 +314,7 @@ backend/
   src/scout/
     agent/          state, planner, reflector, tools, loop, synthesis
     acquisition/    API adapters, MCP client, RPA workflows, read-only GUI
+    memory/         Engram HTTP adapter（检索上下文 + episodic write）
     policy/         capability, allowlist/SSRF, injection detection
     sandbox/        Python + GUI sandbox boundaries
     eval/           50-task runner, graders, metrics, baselines, report
@@ -332,7 +334,7 @@ reports/            评测报告（生成）
 
 ```bash
 cd D:\scout\backend
-pytest -q          # 107 tests
+pytest -q          # 116 tests
 ruff check src tests
 mypy src/scout
 ```
@@ -343,7 +345,7 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端测�
 
 ## 简历 bullet（实测数字）
 
-- 构建 **Scout**，一个 citation-first 的 AI 技术调研 Agent：FastAPI + React/SSE + SQLite、5 个工具、证据板、capability policy、哈希链审计；**107 tests**、**36 security cases** 通过。
+- 构建 **Scout**，一个 citation-first 的 AI 技术调研 Agent：FastAPI + React/SSE + SQLite、5 个工具、证据板、capability policy、哈希链审计；**116 tests**、**36 security cases** 通过。
 - 设计混合获取路由 **API → MCP → RPA → read-only GUI**，包含 SSRF/allowlist、prompt-injection 标记、Docker 沙箱边界和 HITL。
 - 构建 **50 题**评测集（fact / multi-hop / comparison / procedure / conflict / abstention），规则 + LLM grader + baseline；full live Scout **28/50（56%）vs RAG 18/50（36%）**，comparison（7/10 vs 3/10）、abstention（4/5 vs 0/5）、conflict（2/5 vs 0/5）、multi-hop（7/15 vs 6/15）更好。
 - 交付完整 React + FastAPI 产品：实时 SSE 时间线、证据板、citation-bound 报告、评测面板、审批页；包含 Dockerfile 和 Compose。
@@ -357,7 +359,8 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端测�
 - **成本/延迟**：每任务约 27k tokens、p50 约 40s；有一个 comparison 题长尾重试（分类 p95 ~659s）。
 - **fastembed** 已安装测试但不设默认：CPU 建索引慢，中文 query 排序在该语料上不稳定。
 - **校准状态：** 已执行 assistant adjudication 一致性检查（20 条 held-out，85% 一致、kappa 0.70）；**人工 judge 校准仍未完成**，因此不要报告 judge-human kappa。详见 `docs/EVALUATION.md` §11.3。
-- Docker 本地验证通过；GitHub Actions 会跑 backend/frontend/docker 三个 job。真实 MCP fetch server、GitHub RPA workflow、只读 GUI fallback 已做 live 验证（`docs/LIVE_ACQUISITION.md`）；MCP 开放式 search 和 GUI 登录/分页仍未覆盖。
+- Docker 本地验证通过；GitHub Actions 会跑 backend/frontend/docker 三个 job。真实 MCP fetch、arXiv MCP search、GitHub RPA、只读 GUI fallback 已做 live 验证（`docs/LIVE_ACQUISITION.md`）；MCP search 目前仅 arXiv，GUI 登录/分页仍未覆盖。
+- **Engram 记忆是 opt-in + fail-open**：它只作为规划上下文，不是证据；live 验证里的偏好是手动写入的。见 `docs/MEMORY.md`。
 - `SCOUT_SANDBOX_BACKEND=subprocess` 是弱隔离；强边界请用 `docker`。
 
 ---
@@ -367,7 +370,9 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端测�
 - [ ] 改进 procedure synthesis 和 conflict coverage。
 - [ ] held-out 20 题 × 2 seeds 已完成；full 50 多 seed 仍待做。
 - [ ] 加 fastembed 索引缓存 + title/entity reranking。
-- [x] 接入真实 MCP fetch server、RPA workflow 和只读 GUI fallback（live 验证）。
+- [x] 接入真实 MCP search（arXiv）/ fetch server、RPA workflow 和只读 GUI fallback。
+- [x] 接入 Engram memory adapter（规划上下文 + episodic write）。
+- [x] 前端 URL router、error boundary、Playwright e2e smoke。
 - [ ] 在 CI 里跑 GUI fallback smoke（需要 chromium 下载）。
 - [ ] Ed25519 attestations + external audit anchoring。
 - [ ] 远程 CI 变绿 + CI 内 Docker smoke。
@@ -390,6 +395,8 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端测�
 - [API](docs/API.md)
 - [安全](docs/SECURITY.md)
 - [评测](docs/EVALUATION.md)
+- [混合获取 live 验证](docs/LIVE_ACQUISITION.md)
+- [Engram 记忆适配](docs/MEMORY.md)
 - [阶段与交付记录](docs/PHASES.md)
 - [3 分钟演示](docs/DEMO.md)
 - [技术博客草稿](docs/BLOG.md)

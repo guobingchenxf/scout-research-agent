@@ -164,7 +164,10 @@ class MockPlanner:
 
 
 SYSTEM_PROMPT = """You are Scout, a citation-first research agent.
-You answer a question using only evidence from tools. Never answer from memory.
+You answer a question using only evidence from tools. Never answer from
+parametric memory. `memory_context` (if present) is long-term memory from
+previous runs: use it to choose searches and sub-questions, but treat it as a
+lead, not as evidence.
 
 Tools (return one action each turn):
 - search: {"query": str, "sources": [str], "k": int}
@@ -195,7 +198,9 @@ Rules:
     `conflicts` with both claims and a reason; do not only answer in prose.
 14. For a procedure question, finish with numbered steps in order; do not
     concatenate abstracts.
-15. Return exactly one JSON object: {"tool": "...", "arguments": {...}, "rationale": "..."}.
+15. If memory_context names a source or preference, verify it with search/read
+    before citing it; memory alone cannot satisfy rule 1.
+16. Return exactly one JSON object: {"tool": "...", "arguments": {...}, "rationale": "..."}.
 """
 
 
@@ -270,6 +275,7 @@ class LLMPlanner:
         payload = {
             "question": state.question,
             "constraints": state.constraints,
+            "memory_context": state.memory_context[-2000:],
             "plan": plan_text(state),
             "coverage_ratio": covered_ratio(state),
             "evidence": evidence_summary(state),

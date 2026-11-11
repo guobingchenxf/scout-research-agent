@@ -21,6 +21,7 @@ from .config import ScoutConfig
 from .corpus import ingest_corpus, load_manifest
 from .hitl import ApprovalGate
 from .llm import LLMClient
+from .memory import build_memory_client
 from .policy.allowlist import AllowlistPolicy
 from .policy.capability import PolicyEngine
 from .policy.injection import InjectionDetector
@@ -158,6 +159,7 @@ def cmd_baseline(args: argparse.Namespace, config: ScoutConfig) -> int:
 def cmd_run(args: argparse.Namespace, config: ScoutConfig) -> int:
     store = _store(config)
     router = build_acquisition_router(config)
+    memory = build_memory_client(config)
     try:
         index = _index(config, store)
         if not index.chunks:
@@ -221,6 +223,7 @@ def cmd_run(args: argparse.Namespace, config: ScoutConfig) -> int:
             Reflector(store),
             synthesizer=Synthesizer(llm, config.model_planner) if llm is not None else None,
             trace_directory=str(config.db_path.parent / "traces"),
+            memory=memory,
         )
         try:
             result = loop.run(args.question)
@@ -230,6 +233,8 @@ def cmd_run(args: argparse.Namespace, config: ScoutConfig) -> int:
                 llm.close()
     finally:
         router.close()
+        if memory is not None:
+            memory.close()
         store.close()
     return 0
 

@@ -2,7 +2,7 @@
 
 **A citation-first AI technology research agent.**
 
-[![tests](https://img.shields.io/badge/tests-107%20passing-2ea44f)](#testing)
+[![tests](https://img.shields.io/badge/tests-116%20passing-2ea44f)](#testing)
 [![python](https://img.shields.io/badge/python-3.10-3776AB)](#quickstart)
 [![fastapi](https://img.shields.io/badge/FastAPI-0.162-009688)](#architecture)
 [![react](https://img.shields.io/badge/React-19-61DAFB)](#frontend)
@@ -25,7 +25,7 @@ reproducible, and every action must stay inside a capability boundary.*
 
 > A 3-minute walkthrough and talk track: [`docs/DEMO.md`](docs/DEMO.md).
 
-> **Status:** 107 tests · 36 security cases · 50-task evaluation · Docker
+> **Status:** 116 tests · 36 security cases · 50-task evaluation · Docker
 > one-command deploy. Full 50 live evaluation (DeepSeek flash):
 > **Scout 28/50 (56%) vs single-shot RAG 18/50 (36%)**.
 > See [`docs/PHASES.md`](docs/PHASES.md) for the delivery log.
@@ -151,6 +151,8 @@ and a policy verdict.
 - FastAPI backend with async runs and SSE;
 - React + Vite + TypeScript UI: task, timeline, evidence board, report, eval
   dashboard, approvals, sources/policy;
+- URL routes and deep links (`/runs/:id/report`), error boundary, Playwright
+  e2e smoke test;
 - SQLite persistence, replayable traces, Docker Compose deployment.
 
 ---
@@ -191,8 +193,9 @@ framework dependency.
 
 - **Engram** is the trustworthy long-term memory layer.
 - **Scout** is the trustworthy evidence and research layer.
-- Scout can optionally use Engram for project memory, user preferences and
-  signed provenance; the core evaluation does not depend on it.
+- Scout reads relevant memories before planning and writes one episodic memory
+  per finished run through Engram's HTTP API; the core evaluation does not
+  depend on it. See [`docs/MEMORY.md`](docs/MEMORY.md).
 
 Scout is the P0 integration promised in Engram’s roadmap: a Deep Research Agent
 using the memory layer.
@@ -349,6 +352,7 @@ backend/
   src/scout/
     agent/          state, planner, reflector, tools, loop, synthesis
     acquisition/    API adapters, MCP client, RPA workflows, read-only GUI
+    memory/         Engram HTTP adapter (search context + episodic write)
     policy/         capability, allowlist/SSRF, injection detection
     sandbox/        Python + GUI sandbox boundaries
     eval/           50-task runner, graders, metrics, baselines, report
@@ -368,7 +372,7 @@ reports/            eval reports (generated)
 
 ```bash
 cd D:\scout\backend
-pytest -q          # 107 tests
+pytest -q          # 116 tests
 ruff check src tests
 mypy src/scout
 ```
@@ -382,7 +386,7 @@ backend tests + lint, frontend build, Docker build.
 
 - Built **Scout**, a citation-first AI research agent: FastAPI + React/SSE +
   SQLite, five tools, evidence board, capability policy, hash-chained audit;
-  **107 tests** and **36 security cases** pass.
+  **116 tests** and **36 security cases** pass.
 - Designed hybrid acquisition routing **API → MCP → RPA → read-only GUI** with
   SSRF/allowlist, prompt-injection marking, Docker sandbox boundary and HITL.
 - Built a **50-task** evaluation set (fact / multi-hop / comparison / procedure /
@@ -410,9 +414,12 @@ backend tests + lint, frontend build, Docker build.
   still pending**, so do not report a judge-human kappa. See
   `docs/EVALUATION.md` §11.3.
 - Docker is verified locally; the GitHub Actions workflow runs backend,
-  frontend and docker jobs. A real MCP fetch server, the GitHub RPA workflow
-  and the read-only GUI fallback are live-verified (`docs/LIVE_ACQUISITION.md`);
-  open-ended MCP search and logged-in/paginated GUI flows are not covered.
+  frontend and docker jobs. Real MCP fetch, arXiv MCP search, GitHub RPA and the
+  read-only GUI fallback are live-verified (`docs/LIVE_ACQUISITION.md`); MCP
+  search is arXiv-only and logged-in/paginated GUI flows are not covered.
+- **Engram memory is opt-in and fail-open.** It is planning context, not
+  evidence; the live check seeded the preference manually. See
+  `docs/MEMORY.md`.
 - `SCOUT_SANDBOX_BACKEND=subprocess` is weak isolation; use `docker` for the
   strong boundary.
 
@@ -423,7 +430,9 @@ backend tests + lint, frontend build, Docker build.
 - [ ] Improve procedure synthesis and conflict coverage.
 - [ ] Held-out 20 × 2 seeds is done; full 50 multi-seed still pending.
 - [ ] Add fastembed index caching + title/entity reranking.
-- [x] Connect a real MCP fetch server, RPA workflow and read-only GUI fallback.
+- [x] Connect real MCP search (arXiv) and fetch servers, RPA and read-only GUI.
+- [x] Add the Engram memory adapter (search context + episodic write).
+- [x] Add URL routes, an error boundary and a Playwright e2e smoke test.
 - [ ] Exercise the GUI fallback smoke test in CI (needs a chromium download).
 - [ ] Ed25519 attestations + external audit anchoring.
 - [ ] Remote CI green + a Docker smoke test in CI.
@@ -446,6 +455,8 @@ backend tests + lint, frontend build, Docker build.
 - [API](docs/API.md)
 - [Security](docs/SECURITY.md)
 - [Evaluation](docs/EVALUATION.md)
+- [Live acquisition verification](docs/LIVE_ACQUISITION.md)
+- [Engram memory adapter](docs/MEMORY.md)
 - [Phases and delivery log](docs/PHASES.md)
 - [3-minute demo](docs/DEMO.md)
 - [Technical blog draft](docs/BLOG.md)

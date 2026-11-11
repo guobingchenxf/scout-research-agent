@@ -17,9 +17,10 @@ in normal operation the router tries **API → MCP → RPA → GUI** in that ord
 
 | path | ok | method | document | chars | elapsed |
 |---|---|---|---:|---:|---:|
-| MCP fetch | ✅ | `mcp` | `https://docs.vllm.ai/en/latest/` | 4,589 | 0.57s |
-| RPA GitHub README | ✅ | `rpa` | `docs:github:vllm-project/vllm` | 5,864 | 0.53s |
-| GUI (Playwright) | ✅ | `gui` | `docs.vllm.ai` (title: vLLM) | 3,382 | 4.51s |
+| MCP fetch | ✅ | `mcp` | `https://docs.vllm.ai/en/latest/` | 4,589 | 2.10s |
+| MCP arXiv search | ✅ | `mcp` | 3 papers (`arxiv:2405.04437`, `arxiv:2603.08743`, `arxiv:2509.04377`) | 505 | 2.64s |
+| RPA GitHub README | ✅ | `rpa` | `docs:github:vllm-project/vllm` | 5,864 | 1.22s |
+| GUI (Playwright) | ✅ | `gui` | `docs.vllm.ai` (title: vLLM) | 3,372 | 4.21s |
 | GUI allowlist denial | ✅ | — | `example.com` rejected | 0 | — |
 
 Raw output: `reports/live_acquisition.json` (gitignored; numbers above are the
@@ -41,6 +42,21 @@ returned document is normalized into `SourceDocument` with
 `retrieval_method=mcp`. The server respects `robots.txt`; no ignore flag is
 used.
 
+### MCP search: arXiv over stdio
+
+The search path uses the arXiv MCP server:
+
+```text
+uvx arxiv-mcp-server
+```
+
+`AcquisitionRouter.search` tries `web_search`, `search`, then `search_papers`.
+For `search_papers` the adapter parses the server's JSON text and builds one
+`SourceDocument` per paper (`arxiv:<id>`, `source_type=paper`,
+`retrieval_method=mcp`). The live query returned 3 papers, including
+*vAttention: Dynamic Memory Management for Serving LLMs without PagedAttention*
+(`arxiv:2405.04437`).
+
 ### RPA: fixed GitHub workflow
 
 `RpaRunner` matches the URL pattern and runs one known adapter
@@ -61,8 +77,9 @@ injection; a non-allowlisted host (`example.com`) is rejected.
 The default service stays offline. Opt in through `.env`:
 
 ```dotenv
+# Search-capable server (used by router.search)
 SCOUT_MCP_COMMAND=uvx
-SCOUT_MCP_ARGS=["mcp-server-fetch"]
+SCOUT_MCP_ARGS=["arxiv-mcp-server"]
 SCOUT_MCP_TIMEOUT_SECONDS=30
 
 SCOUT_RPA_ENABLED=true
@@ -72,13 +89,26 @@ SCOUT_GUI_ALLOWED_HOSTS=docs.vllm.ai,modelcontextprotocol.io
 SCOUT_GUI_BROWSER_CHANNEL=msedge   # empty + `playwright install chromium` elsewhere
 ```
 
+The same setting can point at a fetch server instead:
+
+```dotenv
+SCOUT_MCP_COMMAND=uvx
+SCOUT_MCP_ARGS=["mcp-server-fetch"]
+```
+
+One MCP server is configured per process; use the arXiv server for search or
+the fetch server for read fallback.
+
 `scripts/verify_live_acquisition.py` can be used as a smoke test after changing
 any of these settings.
 
 ## Limits
 
-- MCP is wired for **fetch/read**; open-ended MCP **search** still needs a
-  search-capable server. The current API adapters cover search.
+- MCP search is **arXiv-only** in the verified setup. A general web-search MCP
+  server was tried (`duckduckgo-mcp-server`) but DuckDuckGo blocked it with bot
+  detection from this network, so it is not the default.
+- One MCP server per process: the arXiv server serves `search`; the fetch
+  server serves `read`. The API adapters still cover both paths first.
 - The MCP server is fetched by `uvx` on first use; the machine needs `uvx` and
   network access.
 - GUI uses installed Edge on Windows. On Linux/CI, leave the channel empty and

@@ -56,6 +56,24 @@ def test_llm_planner_parses_json() -> None:
     assert decision.arguments["query"] == "PagedAttention"
 
 
+def test_llm_planner_includes_memory_context() -> None:
+    from scout.agent.state import new_state
+
+    llm = MockLLM(
+        [
+            '{"subquestions": ["definition", "comparison"]}',
+            '{"tool": "search", "arguments": {"query": "q"}, "rationale": "r"}',
+        ]
+    )
+    planner = LLMPlanner(llm, "deepseek-flash")
+    state = new_state("q")
+    state.memory_context = "Prior memory: prefer docs.vllm.ai"
+    planner.plan(state, PlannerContext())
+    prompt = llm.calls[1][1]["content"]
+    assert "memory_context" in prompt
+    assert "docs.vllm.ai" in prompt
+
+
 def test_llm_planner_falls_back_on_invalid_json() -> None:
     from scout.agent.state import new_state
 

@@ -290,3 +290,16 @@
   - GUI：headless Edge，只读提取 3,382 chars；非白名单 host 被拒绝。
 - 详情：`docs/LIVE_ACQUISITION.md`。
 - 回归：107 tests passed；ruff / mypy 通过。
+
+## P1 第二块：MCP search / Engram / 前端路由（2026-11-11）
+
+- 真实 MCP search：`uvx arxiv-mcp-server`，`search_papers` 结果解析为
+  `arxiv:<id>` SourceDocument；DuckDuckGo MCP 被 bot detection 拦截，
+  未设为默认。
+- Engram memory adapter：`POST /v1/memories/search` 注入 planner
+  `memory_context`；finished run 写入 episodic memory（`source_type=agent`，
+  失败 fail-open）。见 `docs/MEMORY.md`。
+- 前端：React Router 深链（`/runs/:id/report` 等）、error boundary、
+  404 页、SPA fallback、Playwright e2e smoke（9 checks）。
+- 修复：`/v1/eval/summaries` 读取 `.details.json` 列表时 500。
+- 回归：**116 tests passed**；ruff / mypy / frontend build 通过。

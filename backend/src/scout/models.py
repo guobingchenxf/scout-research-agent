@@ -200,6 +200,7 @@ class ResearchState(BaseModel):
 
     question: str
     constraints: dict[str, Any] = Field(default_factory=dict)
+    memory_context: str = ""
     plan: list[SubQuestion] = Field(default_factory=list)
     coverage: dict[str, Coverage] = Field(default_factory=dict)
     evidence_board: list[Evidence] = Field(default_factory=list)

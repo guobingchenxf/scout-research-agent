@@ -1000,3 +1000,53 @@ blockquote {
     width: 100%;
   }
 }
+
+/* Fatal error boundary */
+.fatal {
+  max-width: 720px;
+  margin: 12vh auto;
+  padding: 32px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--line, #e4e7ec);
+  border-radius: 20px;
+}
+
+.fatal h1 {
+  margin: 8px 0 12px;
+}
+
+.fatal-detail {
+  margin: 18px 0;
+  padding: 14px 16px;
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  border-radius: 12px;
+  color: #b42318;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 13px;
+}
+
+.fatal-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.fatal-actions button {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 9px;
+  padding: 9px 18px;
+  border: 1px solid var(--accent, #175cd3);
+  background: var(--accent, #175cd3);
+  color: #fff;
+}
+
+.fatal-actions a {
+  color: var(--accent, #175cd3);
+  font-size: 14px;
+}
