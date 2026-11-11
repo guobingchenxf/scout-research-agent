@@ -112,3 +112,16 @@ Planner 选：
 - 没有 DeepSeek：全程用 `mock` planner。
 - 没有网络：语料已冻结在 `corpus/`，检索和评测不依赖外网。
 - 没有 Docker：本地直接跑后端 + Vite；Docker 只用于最终交付验证。
+
+## 自动生成截图 / 录屏
+
+后端启动后（`http://127.0.0.1:8000`），用 Playwright 驱动本机 Edge，
+自动跑一道 mock 任务并抓取任务页、时间线、证据板、报告、评测、来源页：
+
+```bash
+python -m playwright install ffmpeg   # 第一次录屏需要
+python scripts/capture_demo.py --base-url http://127.0.0.1:8000
+```
+
+产物在 `docs/assets/`（截图 + `demo.webm`）。mock planner 不调用外网，
+可离线复现。

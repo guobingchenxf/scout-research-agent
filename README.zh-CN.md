@@ -46,6 +46,38 @@ Scout 在一个冻结的 AI / Agent / RecSys 语料上回答技术调研问题�
 
 Scout 在 **comparison、abstention、conflict、multi-hop** 上更好，fact 与 RAG 持平，procedure 仍落后。这是诚实的评测结果，也是评测 harness 存在的意义。
 
+### Held-out 验证
+
+50 题按 **30 dev / 20 held-out** 切分，prompt 与启发式只在 dev 上调。两次独立的 held-out 运行（DeepSeek flash，temperature 0）：
+
+| 运行 | 通过 | 通过率 | 引用支持 | 平均 tokens | p50 | p95 |
+|---|---:|---:|---:|---:|---:|---:|
+| seed 1 | 10/20 | 50% | 85% | 28.4k | 35.4s | 68.0s |
+| seed 2 | 8/20 | 40% | 90% | 28.1k | 36.6s | 92.8s |
+| **均值 ± 标准差** | — | **45% ± 5%** | **87.5% ± 2.5%** | **28.2k ± 0.2k** | 36.0s | 80.4s |
+
+Held-out 明显低于 dev 调优后的 28/50，这正是留出集的意义。失败以 `missing_fact` 为主（两次分别为 6/20 和 8/20），即覆盖不足，而不是编造。复现：
+
+```bash
+python scripts/compare_evals.py \
+  reports/eval_heldout_seed1.json reports/eval_heldout_seed2.json
+```
+
+未配置单价时成本显示为 `$0`；设置 `SCOUT_COST_INPUT_PER_1K` / `SCOUT_COST_OUTPUT_PER_1K` 后报告 `$/task`。
+
+### 截图
+
+<p align="center">
+  <img src="docs/assets/evidence.png" alt="证据板" width="49%" />
+  <img src="docs/assets/report.png" alt="citation-bound 报告" width="49%" />
+</p>
+<p align="center">
+  <img src="docs/assets/eval.png" alt="评测面板" width="49%" />
+  <img src="docs/assets/sources.png" alt="来源与获取策略" width="49%" />
+</p>
+
+短录屏（mock planner，无网络）：[`docs/assets/demo.webm`](docs/assets/demo.webm)。
+
 ---
 
 ## Scout 的不同之处
@@ -218,6 +250,8 @@ python scripts/fetch_corpus.py \
 | `SCOUT_CORPUS_DIR` | `./corpus` | 冻结语料 |
 | `SCOUT_MAX_STEPS` | `25` | 每 run 最大步数 |
 | `SCOUT_TOKEN_BUDGET` | `60000` | 每 run token 预算 |
+| `SCOUT_COST_INPUT_PER_1K` | `0` | 每 1k input token 单价（设置后才报告 $/task） |
+| `SCOUT_COST_OUTPUT_PER_1K` | `0` | 每 1k output token 单价 |
 | `SCOUT_VERIFY_DNS` | `true` | 拒绝私网/保留 IP（SSRF） |
 | `SCOUT_SANDBOX_BACKEND` | `disabled` | `disabled`、`subprocess`（弱）、`docker`（强） |
 | `SCOUT_REQUIRE_AUTH` | `false` | API key 认证（仅 loopback 开发） |

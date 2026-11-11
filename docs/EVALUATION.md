@@ -252,3 +252,39 @@ python scripts/calibrate.py --csv eval/calibration.csv
 
 - `calibrate.py` 输出 rule-grader 与人工标签的一致率和 Cohen's kappa。
 - 明确限制：单标注者校准，不等于双人标注；不要把未填写的 CSV 当成已完成校准。
+- 多 seed 汇总：
+
+```bash
+python scripts/compare_evals.py \
+  reports/eval_heldout_seed1.json reports/eval_heldout_seed2.json
+```
+
+输出 pass rate、citation support、steps、tokens、p50/p95、cost 的均值和标准差。
+
+### 11.1 Held-out 多 seed 结果
+
+DeepSeek flash，temperature 0，`--split heldout`，20 题：
+
+| seed | 通过 | 通过率 | citation support | avg tokens | p50 | p95 |
+|---|---:|---:|---:|---:|---:|---:|
+| 1 | 10/20 | 50% | 85% | 28,362 | 35.4s | 68.0s |
+| 2 | 8/20 | 40% | 90% | 28,054 | 36.6s | 92.8s |
+| 均值 ± 标准差 | — | 45% ± 5% | 87.5% ± 2.5% | 28,208 ± 154 | 36.0s | 80.4s |
+
+- 失败分类：seed 1 为 missing_fact 6 / over_abstention 3 / missing_citation 1；
+  seed 2 为 missing_fact 8 / over_abstention 2 / missing_citation 2。
+- 结论：held-out 低于 dev 调优后的 28/50，说明 prompt 调优存在 dev 过拟合；
+  对外报告以 held-out 为主，dev 结果只作为调优参考。
+- 成本：当前未配置单价，`total_cost_usd = 0`；这不是“零成本”，而是
+  “未计价”。配置 `SCOUT_COST_INPUT_PER_1K` / `SCOUT_COST_OUTPUT_PER_1K`
+  后才会按 token 计价。
+- 原始报告：`reports/eval_heldout_seed1.{json,md,details.json}`、
+  `reports/eval_heldout_seed2.{json,md,details.json}`。
+
+### 11.2 人工校准状态
+
+- 已生成 `eval/calibration.csv`：20 条 held-out 答案，含 rule verdict 和空白
+  `human_pass` 列。
+- **kappa 尚未计算**：必须先由人工盲标 `human_pass`（pass/fail），再运行
+  `scripts/calibrate.py`。未标注前不要在任何材料里声称已完成人工校准。
+

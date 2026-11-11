@@ -55,6 +55,43 @@ Scout wins on **comparison**, **abstention**, **conflict** and **multi-hop**;
 ties RAG on **fact**; still loses on **procedure**. That is the honest result,
 and it is the reason the evaluation harness exists.
 
+### Held-out validation
+
+The 50 tasks are split into **30 dev / 20 held-out**; prompts and heuristics
+were tuned only on dev. Two independent held-out runs (DeepSeek flash,
+temperature 0):
+
+| Run | Passed | Pass rate | Citation support | Avg tokens | p50 | p95 |
+|---|---:|---:|---:|---:|---:|---:|
+| seed 1 | 10/20 | 50% | 85% | 28.4k | 35.4s | 68.0s |
+| seed 2 | 8/20 | 40% | 90% | 28.1k | 36.6s | 92.8s |
+| **mean ± std** | — | **45% ± 5%** | **87.5% ± 2.5%** | **28.2k ± 0.2k** | 36.0s | 80.4s |
+
+Held-out is lower than the dev-tuned 28/50 — that is the point of holding it
+out. Failures are dominated by `missing_fact` (6 and 8 of 20), i.e. coverage,
+not fabrication. Reproduce with:
+
+```bash
+python scripts/compare_evals.py \
+  reports/eval_heldout_seed1.json reports/eval_heldout_seed2.json
+```
+
+Cost is reported as `$0` until provider prices are configured; set
+`SCOUT_COST_INPUT_PER_1K` / `SCOUT_COST_OUTPUT_PER_1K` to get `$/task`.
+
+### Screenshots
+
+<p align="center">
+  <img src="docs/assets/evidence.png" alt="Evidence board" width="49%" />
+  <img src="docs/assets/report.png" alt="Citation-bound report" width="49%" />
+</p>
+<p align="center">
+  <img src="docs/assets/eval.png" alt="Evaluation panel" width="49%" />
+  <img src="docs/assets/sources.png" alt="Sources and acquisition policy" width="49%" />
+</p>
+
+A short screen recording (mock planner, no network): [`docs/assets/demo.webm`](docs/assets/demo.webm).
+
 ---
 
 ## What makes Scout different
@@ -235,6 +272,8 @@ Copy `.env.example` to `.env`. The important variables:
 | `SCOUT_CORPUS_DIR` | `./corpus` | frozen corpus |
 | `SCOUT_MAX_STEPS` | `25` | per-run step budget |
 | `SCOUT_TOKEN_BUDGET` | `60000` | per-run token budget |
+| `SCOUT_COST_INPUT_PER_1K` | `0` | input price per 1k tokens (set to report $/task) |
+| `SCOUT_COST_OUTPUT_PER_1K` | `0` | output price per 1k tokens |
 | `SCOUT_VERIFY_DNS` | `true` | reject private/reserved IPs (SSRF) |
 | `SCOUT_SANDBOX_BACKEND` | `disabled` | `disabled`, `subprocess` (weak), or `docker` (strong) |
 | `SCOUT_REQUIRE_AUTH` | `false` | API key auth (loopback dev only) |
