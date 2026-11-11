@@ -15,11 +15,14 @@
           "quote": "Efficient management of attention key and value memory"
         }
       ],
-      "required_citations": ["docs:github:vllm-project/vllm"],
+      "required_citations": [
+        "docs:github:vllm-project/vllm"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "fact_sglang_radixattention",
@@ -34,11 +37,14 @@
           "quote": "exact token-level prefix caching (SGLang RadixAttention)"
         }
       ],
-      "required_citations": ["crossref:10.2139/ssrn.7290195"],
+      "required_citations": [
+        "crossref:10.2139/ssrn.7290195"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "fact_trtllm_kernels",
@@ -53,11 +59,14 @@
           "quote": "TensorRT LLM optimizes inference for LLMs and Visual Gen models with specialized kernels"
         }
       ],
-      "required_citations": ["docs:github:NVIDIA/TensorRT-LLM"],
+      "required_citations": [
+        "docs:github:NVIDIA/TensorRT-LLM"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "fact_langgraph_stateful",
@@ -72,11 +81,14 @@
           "quote": "Low-level orchestration framework for building stateful agents."
         }
       ],
-      "required_citations": ["docs:github:langchain-ai/langgraph"],
+      "required_citations": [
+        "docs:github:langchain-ai/langgraph"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "fact_kv_linear",
@@ -91,11 +103,14 @@
           "quote": "grows linearly with sequence length and batch size"
         }
       ],
-      "required_citations": ["crossref:10.2139/ssrn.7273098"],
+      "required_citations": [
+        "crossref:10.2139/ssrn.7273098"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "fact_keepkv_merging",
@@ -110,11 +125,14 @@
           "quote": "a novel adaptive KV cache merging method designed to preserve performance under strict memory constraints"
         }
       ],
-      "required_citations": ["crossref:10.1609/aaai.v40i39.40611"],
+      "required_citations": [
+        "crossref:10.1609/aaai.v40i39.40611"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "fact_tamarin_tiers",
@@ -129,11 +147,14 @@
           "quote": "a three-tier reversible compression scheme"
         }
       ],
-      "required_citations": ["crossref:10.21203/rs.3.rs-10297225/v1"],
+      "required_citations": [
+        "crossref:10.21203/rs.3.rs-10297225/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "fact_aptserve_ttft",
@@ -148,11 +169,14 @@
           "quote": "significant decline in Time To First Token (TTFT) SLO attainment"
         }
       ],
-      "required_citations": ["crossref:10.1145/3725394"],
+      "required_citations": [
+        "crossref:10.1145/3725394"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "fact_orbitflow_ilp",
@@ -167,11 +191,14 @@
           "quote": "OrbitFlow employs a lightweight ILP solver"
         }
       ],
-      "required_citations": ["crossref:10.14778/3796195.3796214"],
+      "required_citations": [
+        "crossref:10.14778/3796195.3796214"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "fact_secrag_dimensions",
@@ -186,11 +213,14 @@
           "quote": "factual accuracy, hallucination avoidance, adversarial robustness, bias and fairness, toxicity, security, and calibration"
         }
       ],
-      "required_citations": ["crossref:10.20944/preprints202510.0418.v1"],
+      "required_citations": [
+        "crossref:10.20944/preprints202510.0418.v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "hop_vllm_vs_sglang",
@@ -210,11 +240,15 @@
           "quote": "exact token-level prefix caching (SGLang RadixAttention)"
         }
       ],
-      "required_citations": ["docs:github:vllm-project/vllm", "crossref:10.2139/ssrn.7290195"],
+      "required_citations": [
+        "docs:github:vllm-project/vllm",
+        "crossref:10.2139/ssrn.7290195"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "hop_keepkv_vs_tamarin",
@@ -234,11 +268,15 @@
           "quote": "a three-tier reversible compression scheme"
         }
       ],
-      "required_citations": ["crossref:10.1609/aaai.v40i39.40611", "crossref:10.21203/rs.3.rs-10297225/v1"],
+      "required_citations": [
+        "crossref:10.1609/aaai.v40i39.40611",
+        "crossref:10.21203/rs.3.rs-10297225/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "hop_empiric_vs_keepkv",
@@ -258,11 +296,15 @@
           "quote": "a novel adaptive KV cache merging method designed to preserve performance under strict memory constraints"
         }
       ],
-      "required_citations": ["crossref:10.1145/3759441.3759448", "crossref:10.1609/aaai.v40i39.40611"],
+      "required_citations": [
+        "crossref:10.1145/3759441.3759448",
+        "crossref:10.1609/aaai.v40i39.40611"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "hop_aptserve_orbitflow",
@@ -282,11 +324,15 @@
           "quote": "OrbitFlow employs a lightweight ILP solver"
         }
       ],
-      "required_citations": ["crossref:10.1145/3725394", "crossref:10.14778/3796195.3796214"],
+      "required_citations": [
+        "crossref:10.1145/3725394",
+        "crossref:10.14778/3796195.3796214"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "hop_traditional_agentic_rag",
@@ -306,11 +352,14 @@
           "quote": "Agentic RAG extends this framework with autonomous agents that plan, iterate retrieval, integrate tools, and reason over intermediate results"
         }
       ],
-      "required_citations": ["crossref:10.36227/techrxiv.175624551.12254549/v1"],
+      "required_citations": [
+        "crossref:10.36227/techrxiv.175624551.12254549/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "hop_query_decomp_rerank",
@@ -325,11 +374,14 @@
           "quote": "decomposes complex queries into self-contained sub-questions and employs a Cross-Encoder to rerank candidates"
         }
       ],
-      "required_citations": ["crossref:10.66245/jyi.v1.i1.002"],
+      "required_citations": [
+        "crossref:10.66245/jyi.v1.i1.002"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "hop_rerank_followup",
@@ -344,11 +396,14 @@
           "quote": "incorporating LLM-generated predicted follow-up queries coupled with the initial user query"
         }
       ],
-      "required_citations": ["crossref:10.21203/rs.3.rs-7506627/v1"],
+      "required_citations": [
+        "crossref:10.21203/rs.3.rs-7506627/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "hop_secrag_monitors",
@@ -368,11 +423,14 @@
           "quote": "factual accuracy, hallucination avoidance, adversarial robustness, bias and fairness, toxicity, security, and calibration"
         }
       ],
-      "required_citations": ["crossref:10.20944/preprints202510.0418.v1"],
+      "required_citations": [
+        "crossref:10.20944/preprints202510.0418.v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "hop_harness_taxonomy",
@@ -387,11 +445,14 @@
           "quote": "We distinguish three harness families."
         }
       ],
-      "required_citations": ["crossref:10.20944/preprints202609.0236.v1"],
+      "required_citations": [
+        "crossref:10.20944/preprints202609.0236.v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "hop_prompt_injection_portability",
@@ -406,11 +467,14 @@
           "quote": "evaluate the attack success rate (ASR) of 11 models from five different vendors"
         }
       ],
-      "required_citations": ["crossref:10.21203/rs.3.rs-10962146/v1"],
+      "required_citations": [
+        "crossref:10.21203/rs.3.rs-10962146/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "hop_ghost_context",
@@ -425,11 +489,14 @@
           "quote": "A model exhibiting Ghost Context uses information that is present but should not influence the current output."
         }
       ],
-      "required_citations": ["crossref:10.36227/techrxiv.177162116.61215374/v1"],
+      "required_citations": [
+        "crossref:10.36227/techrxiv.177162116.61215374/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "hop_repro_serving_stack",
@@ -449,11 +516,14 @@
           "quote": "Self-hosted standard open-weight models reproduce their own output on 96.6 to 100 percent of cases."
         }
       ],
-      "required_citations": ["crossref:10.2139/ssrn.7083993"],
+      "required_citations": [
+        "crossref:10.2139/ssrn.7083993"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "hop_scheduler_portability",
@@ -473,11 +543,14 @@
           "quote": "as low as 0.55"
         }
       ],
-      "required_citations": ["crossref:10.21203/rs.3.rs-10935389/v1"],
+      "required_citations": [
+        "crossref:10.21203/rs.3.rs-10935389/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "hop_agent_gov_bench",
@@ -492,11 +565,14 @@
           "quote": "It measures governance continuity"
         }
       ],
-      "required_citations": ["crossref:10.2139/ssrn.7622058"],
+      "required_citations": [
+        "crossref:10.2139/ssrn.7622058"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "hop_context_management",
@@ -516,11 +592,14 @@
           "quote": "retrieving only the turns most relevant to the current query"
         }
       ],
-      "required_citations": ["crossref:10.2139/ssrn.6961019"],
+      "required_citations": [
+        "crossref:10.2139/ssrn.6961019"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "cmp_vllm_trtllm",
@@ -540,11 +619,15 @@
           "quote": "TensorRT LLM optimizes inference for LLMs and Visual Gen models with specialized kernels"
         }
       ],
-      "required_citations": ["docs:github:vllm-project/vllm", "docs:github:NVIDIA/TensorRT-LLM"],
+      "required_citations": [
+        "docs:github:vllm-project/vllm",
+        "docs:github:NVIDIA/TensorRT-LLM"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "cmp_keepkv_eviction",
@@ -559,11 +642,14 @@
           "quote": "Traditional methods selectively evict less important KV cache entries, which leads to information loss and hallucinations."
         }
       ],
-      "required_citations": ["crossref:10.1609/aaai.v40i39.40611"],
+      "required_citations": [
+        "crossref:10.1609/aaai.v40i39.40611"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "cmp_empiric_heuristic",
@@ -583,11 +669,14 @@
           "quote": "existing methods primarily rely on heuristic-driven approaches"
         }
       ],
-      "required_citations": ["crossref:10.1145/3759441.3759448"],
+      "required_citations": [
+        "crossref:10.1145/3759441.3759448"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "cmp_query_decomp_baseline",
@@ -602,11 +691,14 @@
           "quote": "standard single-hop retrieval often fails on complex, multi-hop queries"
         }
       ],
-      "required_citations": ["crossref:10.66245/jyi.v1.i1.002"],
+      "required_citations": [
+        "crossref:10.66245/jyi.v1.i1.002"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "cmp_candidate_rerank",
@@ -621,11 +713,14 @@
           "quote": "candidate evidence reranking (CAPE) combines trajectory ranks, lexical matching, and event-entity structural features"
         }
       ],
-      "required_citations": ["crossref:10.21203/rs.3.rs-11009751/v1"],
+      "required_citations": [
+        "crossref:10.21203/rs.3.rs-11009751/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "cmp_agentic_api_naming",
@@ -640,11 +735,14 @@
           "quote": "In mixed-paradigm conditions, agentic methods outperform"
         }
       ],
-      "required_citations": ["crossref:10.2139/ssrn.6460766"],
+      "required_citations": [
+        "crossref:10.2139/ssrn.6460766"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "cmp_tool_registry_puffery",
@@ -659,11 +757,14 @@
           "quote": "captures 100% of the optimization effect"
         }
       ],
-      "required_citations": ["crossref:10.2139/ssrn.6607420"],
+      "required_citations": [
+        "crossref:10.2139/ssrn.6607420"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "cmp_governance_auth",
@@ -678,11 +779,14 @@
           "quote": "Unsafe actions occurred in 0.7% of fully governed versus 0.4% of unconstrained episodes"
         }
       ],
-      "required_citations": ["crossref:10.21203/rs.3.rs-11133816/v1"],
+      "required_citations": [
+        "crossref:10.21203/rs.3.rs-11133816/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "cmp_seci_raw",
@@ -702,11 +806,14 @@
           "quote": "both using the same embedding model and vector database"
         }
       ],
-      "required_citations": ["crossref:10.21203/rs.3.rs-9801639/v1"],
+      "required_citations": [
+        "crossref:10.21203/rs.3.rs-9801639/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "cmp_repro_openweight",
@@ -721,11 +828,14 @@
           "quote": "Self-hosted standard open-weight models reproduce their own output on 96.6 to 100 percent of cases."
         }
       ],
-      "required_citations": ["crossref:10.2139/ssrn.7083993"],
+      "required_citations": [
+        "crossref:10.2139/ssrn.7083993"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "proc_keepkv",
@@ -740,11 +850,17 @@
           "quote": "we propose KeepKV , a novel adaptive KV cache merging method"
         }
       ],
-      "required_citations": ["crossref:10.1609/aaai.v40i39.40611"],
+      "required_citations": [
+        "crossref:10.1609/aaai.v40i39.40611"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev",
+      "constraints": {
+        "mode": "procedure"
+      }
     },
     {
       "id": "proc_tamarin",
@@ -759,11 +875,17 @@
           "quote": "a non-summarized 4-bit focal tier (L1), a 3-bit tier of learned group-summary vectors (L2), and a CPU-RAM archive of all compressed originals stored at 4-bit precision (L3)"
         }
       ],
-      "required_citations": ["crossref:10.21203/rs.3.rs-10297225/v1"],
+      "required_citations": [
+        "crossref:10.21203/rs.3.rs-10297225/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout",
+      "constraints": {
+        "mode": "procedure"
+      }
     },
     {
       "id": "proc_aptserve",
@@ -778,11 +900,17 @@
           "quote": "adaptive request scheduling on hybrid cache"
         }
       ],
-      "required_citations": ["crossref:10.1145/3725394"],
+      "required_citations": [
+        "crossref:10.1145/3725394"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev",
+      "constraints": {
+        "mode": "procedure"
+      }
     },
     {
       "id": "proc_secrag",
@@ -797,11 +925,17 @@
           "quote": "instruments each stage (query, retrieval, generation) with lightweight monitors"
         }
       ],
-      "required_citations": ["crossref:10.20944/preprints202510.0418.v1"],
+      "required_citations": [
+        "crossref:10.20944/preprints202510.0418.v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout",
+      "constraints": {
+        "mode": "procedure"
+      }
     },
     {
       "id": "proc_orbitflow",
@@ -816,18 +950,26 @@
           "quote": "OrbitFlow employs a lightweight ILP solver"
         }
       ],
-      "required_citations": ["crossref:10.14778/3796195.3796214"],
+      "required_citations": [
+        "crossref:10.14778/3796195.3796214"
+      ],
       "forbidden_claims": [],
       "max_steps": 20,
       "max_cost_usd": 0.1,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev",
+      "constraints": {
+        "mode": "procedure"
+      }
     },
     {
       "id": "conf_keepkv_tamarin_merge",
       "category": "conflict",
       "difficulty": 3,
       "question": "KeepKV 和 Tamarin 对 KV cache merging 的安全性判断一致吗？",
-      "constraints": {"mode": "conflict"},
+      "constraints": {
+        "mode": "conflict"
+      },
       "gold_answer": "不一致：KeepKV 认为 adaptive merging 可以在保性能的同时保留信息；Tamarin 认为 eviction/merge 会永久破坏未来才相关的信息，主张可逆压缩。",
       "gold_evidence": [
         {
@@ -841,18 +983,24 @@
           "quote": "which can destroy information that becomes relevant only after the future query is known"
         }
       ],
-      "required_citations": ["crossref:10.1609/aaai.v40i39.40611", "crossref:10.21203/rs.3.rs-10297225/v1"],
+      "required_citations": [
+        "crossref:10.1609/aaai.v40i39.40611",
+        "crossref:10.21203/rs.3.rs-10297225/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 25,
       "max_cost_usd": 0.15,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "conf_scheduler_repro",
       "category": "conflict",
       "difficulty": 3,
       "question": "Serving benchmark 的排名是否既可移植又可复现？",
-      "constraints": {"mode": "conflict"},
+      "constraints": {
+        "mode": "conflict"
+      },
       "gold_answer": "存在张力：scheduler 排名跨源可高度一致（Kendall tau 到 1.0），但 LLM-based measurement 的复现性依赖 serving stack。",
       "gold_evidence": [
         {
@@ -866,18 +1014,24 @@
           "quote": "reproducibility depends on the serving stack"
         }
       ],
-      "required_citations": ["crossref:10.21203/rs.3.rs-10935389/v1", "crossref:10.2139/ssrn.7083993"],
+      "required_citations": [
+        "crossref:10.21203/rs.3.rs-10935389/v1",
+        "crossref:10.2139/ssrn.7083993"
+      ],
       "forbidden_claims": [],
       "max_steps": 25,
       "max_cost_usd": 0.15,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "conf_prompt_injection",
       "category": "conflict",
       "difficulty": 3,
       "question": "现有 prompt-injection benchmark 是否足够可靠？",
-      "constraints": {"mode": "analysis"},
+      "constraints": {
+        "mode": "analysis"
+      },
       "require_conflict": false,
       "gold_answer": "不够：需要验证跨 benchmark/vendor/defense 的可移植性；Secure-RAG 也指出需要统一 harness 和多维评估。",
       "gold_evidence": [
@@ -892,18 +1046,24 @@
           "quote": "instruments each stage (query, retrieval, generation) with lightweight monitors"
         }
       ],
-      "required_citations": ["crossref:10.21203/rs.3.rs-10962146/v1", "crossref:10.20944/preprints202510.0418.v1"],
+      "required_citations": [
+        "crossref:10.21203/rs.3.rs-10962146/v1",
+        "crossref:10.20944/preprints202510.0418.v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 25,
       "max_cost_usd": 0.15,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "conf_seci_driver",
       "category": "conflict",
       "difficulty": 3,
       "question": "SECI structured extraction 是 agent memory recall 的主要驱动因素吗？",
-      "constraints": {"mode": "analysis"},
+      "constraints": {
+        "mode": "analysis"
+      },
       "require_conflict": false,
       "gold_answer": "不是；93.9% vs 92.1% 的提升很小，论文说主导因素是 embedding model。",
       "gold_evidence": [
@@ -918,18 +1078,23 @@
           "quote": "both using the same embedding model and vector database"
         }
       ],
-      "required_citations": ["crossref:10.21203/rs.3.rs-9801639/v1"],
+      "required_citations": [
+        "crossref:10.21203/rs.3.rs-9801639/v1"
+      ],
       "forbidden_claims": [],
       "max_steps": 25,
       "max_cost_usd": 0.15,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "conf_context_strategy",
       "category": "conflict",
       "difficulty": 3,
       "question": "在 forced context compression 下，哪种 context-management 策略最好？",
-      "constraints": {"mode": "analysis"},
+      "constraints": {
+        "mode": "analysis"
+      },
       "require_conflict": false,
       "gold_answer": "没有单一最优；drop oldest、LLM summary、retrieve relevant turns 各有取舍，需要在受控 fact-recall 任务上比较。",
       "gold_evidence": [
@@ -944,11 +1109,14 @@
           "quote": "under a controlled, fact-recall task"
         }
       ],
-      "required_citations": ["crossref:10.2139/ssrn.6961019"],
+      "required_citations": [
+        "crossref:10.2139/ssrn.6961019"
+      ],
       "forbidden_claims": [],
       "max_steps": 25,
       "max_cost_usd": 0.15,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "abs_vllm_pricing",
@@ -958,10 +1126,15 @@
       "gold_answer": "INSUFFICIENT_EVIDENCE",
       "gold_evidence": [],
       "required_citations": [],
-      "forbidden_claims": ["价格是", "授权费", "每年"],
+      "forbidden_claims": [
+        "价格是",
+        "授权费",
+        "每年"
+      ],
       "max_steps": 10,
       "max_cost_usd": 0.05,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "abs_sglang_acquisition",
@@ -971,10 +1144,14 @@
       "gold_answer": "INSUFFICIENT_EVIDENCE",
       "gold_evidence": [],
       "required_citations": [],
-      "forbidden_claims": ["被收购", "收购方"],
+      "forbidden_claims": [
+        "被收购",
+        "收购方"
+      ],
       "max_steps": 10,
       "max_cost_usd": 0.05,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "abs_h200_memory",
@@ -984,10 +1161,14 @@
       "gold_answer": "INSUFFICIENT_EVIDENCE",
       "gold_evidence": [],
       "required_citations": [],
-      "forbidden_claims": ["141GB", "显存容量是"],
+      "forbidden_claims": [
+        "141GB",
+        "显存容量是"
+      ],
       "max_steps": 10,
       "max_cost_usd": 0.05,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     },
     {
       "id": "abs_llama3_latency",
@@ -997,10 +1178,14 @@
       "gold_answer": "INSUFFICIENT_EVIDENCE",
       "gold_evidence": [],
       "required_citations": [],
-      "forbidden_claims": ["p99 是", "延迟是"],
+      "forbidden_claims": [
+        "p99 是",
+        "延迟是"
+      ],
       "max_steps": 10,
       "max_cost_usd": 0.05,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "dev"
     },
     {
       "id": "abs_nobel",
@@ -1010,10 +1195,13 @@
       "gold_answer": "INSUFFICIENT_EVIDENCE",
       "gold_evidence": [],
       "required_citations": [],
-      "forbidden_claims": ["诺贝尔物理学奖得主是"],
+      "forbidden_claims": [
+        "诺贝尔物理学奖得主是"
+      ],
       "max_steps": 10,
       "max_cost_usd": 0.05,
-      "expected_hitl": false
+      "expected_hitl": false,
+      "split": "heldout"
     }
   ]
 }

@@ -40,11 +40,13 @@ class EvalRunner:
         planner: str = "mock",
         limit: int | None = None,
         categories: set[str] | None = None,
+        split: str | None = None,
     ) -> list[EvalResult]:
         selected = [
             task
             for task in self.tasks
-            if categories is None or task.category.value in categories
+            if (categories is None or task.category.value in categories)
+            and (split is None or split == "all" or task.split == split)
         ]
         if limit:
             selected = selected[:limit]

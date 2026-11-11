@@ -231,3 +231,24 @@ A/B 交换顺序测；长度偏差用 padding 对照。
   - conflict **1/5**，citation 100%，无 over_abstention
 - 剩余问题：procedure 1/5、conflict 2/5、missing_fact 17；fastembed 已
   测试但未设默认（CPU 建索引慢、中文 query 排序不稳定）。
+
+## 11. Dev / held-out 与人工校准
+
+- 任务集按 **30 dev / 20 held-out** 切分；`--split dev|heldout|all` 控制评测子集。
+- 每次 `scout eval` 会同时写：
+  - `reports/eval_*.md`：人可读报告
+  - `reports/eval_*.json`：summary（前端评测面板读取）
+  - `reports/eval_*.details.json`：逐题结果（answer / failure / cost / latency）
+- 人工校准流程：
+
+```bash
+cd D:\scout
+python scripts/make_calibration.py \
+  --details reports/eval_heldout_seed1.details.json \
+  --out eval/calibration.csv
+# 人工把 human_pass 填成 pass/fail
+python scripts/calibrate.py --csv eval/calibration.csv
+```
+
+- `calibrate.py` 输出 rule-grader 与人工标签的一致率和 Cohen's kappa。
+- 明确限制：单标注者校准，不等于双人标注；不要把未填写的 CSV 当成已完成校准。

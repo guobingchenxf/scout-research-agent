@@ -258,7 +258,14 @@ python -m scout.cli eval --system scout --planner mock \
 # Live Scout (DeepSeek flash); full 50 takes ~35–45 min, ~1.37M tokens
 python -m scout.cli eval --system scout --planner deepseek \
   --out reports/eval_scout_deepseek_full.md
+
+# Only the 20 held-out tasks
+python -m scout.cli eval --system scout --planner deepseek --split heldout \
+  --out reports/eval_heldout.md
 ```
+
+Each run also writes `.json` summary and `.details.json` per-task results. The
+`--split dev|heldout|all` flag keeps prompt tuning away from the held-out set.
 
 Reports are written to `reports/` as Markdown + JSON summaries; the UI eval
 dashboard reads the JSON files.
@@ -387,6 +394,7 @@ backend tests + lint, frontend build, Docker build.
 ## Docs
 
 - [Design](docs/DESIGN.md)
+- [API](docs/API.md)
 - [Security](docs/SECURITY.md)
 - [Evaluation](docs/EVALUATION.md)
 - [Phases and delivery log](docs/PHASES.md)

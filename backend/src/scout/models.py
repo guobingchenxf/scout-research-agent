@@ -299,6 +299,7 @@ class EvalTask(BaseModel):
     max_cost_usd: float = 0.10
     expected_hitl: bool = False
     require_conflict: bool = True
+    split: str = "dev"
 
 
 class EvalResult(BaseModel):

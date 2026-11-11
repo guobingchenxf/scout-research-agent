@@ -233,13 +233,24 @@ def run_scout(
         result = loop.run(question, constraints=constraints)
         planner_tokens = int(getattr(planner, "total_tokens", 0))
         synthesizer_tokens = int(getattr(synthesizer, "total_tokens", 0))
+        prompt_tokens = int(getattr(planner, "total_prompt_tokens", 0)) + int(
+            getattr(synthesizer, "total_prompt_tokens", 0)
+        )
+        completion_tokens = int(getattr(planner, "total_completion_tokens", 0)) + int(
+            getattr(synthesizer, "total_completion_tokens", 0)
+        )
+        cost = (
+            prompt_tokens / 1000.0 * config.cost_input_per_1k
+            + completion_tokens / 1000.0 * config.cost_output_per_1k
+            + result.cost_usd
+        )
         return EvalOutput(
             answer=result.report.answer,
             citations=list(result.report.citations),
             report=result.report,
             steps=result.steps,
             tokens=result.tokens + planner_tokens + synthesizer_tokens,
-            cost_usd=result.cost_usd,
+            cost_usd=cost,
             latency_ms=(time.perf_counter() - started) * 1000.0,
             error=result.error,
         )

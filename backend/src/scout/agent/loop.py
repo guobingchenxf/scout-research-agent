@@ -38,7 +38,7 @@ from .state import (
     tick,
     uncovered_subquestions,
 )
-from .synthesis import CONFLICT_PROMPT, Synthesizer
+from .synthesis import CONFLICT_PROMPT, PROCEDURE_PROMPT, Synthesizer
 from .tools import ToolRegistry
 
 _SENTENCE_END = re.compile(r"(?<=[。！？.!?])\s+")
@@ -142,13 +142,18 @@ class AgentLoop:
                 )
                 decision = self.planner.plan(state, context)
                 last_error = None
-                trace.emit(
-                    "plan",
-                    {
-                        "step": state.budget.steps + 1,
-                        **decision.model_dump(mode="json"),
-                    },
-                )
+                plan_payload = {
+                    "step": state.budget.steps + 1,
+                    **decision.model_dump(mode="json"),
+                }
+                usage = getattr(self.planner, "last_usage", None)
+                if usage is not None:
+                    plan_payload["tokens"] = usage.total_tokens
+                    plan_payload["cost_usd"] = (
+                        usage.prompt_tokens / 1000.0 * self.config.cost_input_per_1k
+                        + usage.completion_tokens / 1000.0 * self.config.cost_output_per_1k
+                    )
+                trace.emit("plan", plan_payload)
                 call = ToolCall(
                     call_id=f"{run_id}-{state.budget.steps + 1}",
                     name=decision.tool.value,
@@ -184,9 +189,14 @@ class AgentLoop:
                                 and state.evidence_board
                                 and mode is not None
                             ):
+                                prompt = None
+                                if mode == "conflict":
+                                    prompt = CONFLICT_PROMPT
+                                elif mode == "procedure":
+                                    prompt = PROCEDURE_PROMPT
                                 report = self.synthesizer.synthesize(
                                     state,
-                                    system_prompt=CONFLICT_PROMPT if mode == "conflict" else None,
+                                    system_prompt=prompt,
                                 )
                             else:
                                 report = self._report_from_output(result.output)
@@ -266,7 +276,7 @@ class AgentLoop:
 
     def _synthesis_mode(self, state: ResearchState) -> str | None:
         mode = str(state.constraints.get("mode") or "")
-        if mode in {"conflict", "analysis"}:
+        if mode in {"conflict", "analysis", "procedure"}:
             return mode
         if self.config.enable_synthesis:
             return "general"
@@ -289,10 +299,12 @@ class AgentLoop:
     def _final_report(self, state: ResearchState) -> Report:
         mode = self._synthesis_mode(state)
         if self.synthesizer is not None and state.evidence_board and mode is not None:
-            report = self.synthesizer.synthesize(
-                state,
-                system_prompt=CONFLICT_PROMPT if mode == "conflict" else None,
-            )
+            prompt = None
+            if mode == "conflict":
+                prompt = CONFLICT_PROMPT
+            elif mode == "procedure":
+                prompt = PROCEDURE_PROMPT
+            report = self.synthesizer.synthesize(state, system_prompt=prompt)
         else:
             report = build_report(state)
         return self._apply_abstention_gate(state, report)

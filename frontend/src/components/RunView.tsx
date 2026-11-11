@@ -29,9 +29,19 @@ export default function RunView({ run, events, onRefresh }: Props) {
             {run.ended_at ? ` · ended ${run.ended_at}` : " · in progress"}
           </p>
         </div>
-        <button className="button" onClick={onRefresh}>
-          刷新
-        </button>
+        <div className="row">
+          <a
+            className="button"
+            href={`/v1/runs/${run.id}/trace/view`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            查看 trace
+          </a>
+          <button className="button" onClick={onRefresh}>
+            刷新
+          </button>
+        </div>
       </header>
 
       <div className="grid-run">

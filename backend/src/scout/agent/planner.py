@@ -6,7 +6,7 @@ import json
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-from ..llm import ChatModel, LLMError, extract_json
+from ..llm import ChatModel, LLMError, Usage, extract_json
 from ..models import PlannerDecision, ResearchState, ToolName, ToolResult
 from .state import (
     covered_ratio,
@@ -193,7 +193,9 @@ Rules:
     average them into one claim.
 13. If the question asks whether two sources agree or conflict, fill
     `conflicts` with both claims and a reason; do not only answer in prose.
-14. Return exactly one JSON object: {"tool": "...", "arguments": {...}, "rationale": "..."}.
+14. For a procedure question, finish with numbered steps in order; do not
+    concatenate abstracts.
+15. Return exactly one JSON object: {"tool": "...", "arguments": {...}, "rationale": "..."}.
 """
 
 
@@ -204,6 +206,18 @@ class LLMPlanner:
         self.fallback = fallback or MockPlanner()
         self.last_error: str | None = None
         self.total_tokens = 0
+        self.total_prompt_tokens = 0
+        self.total_completion_tokens = 0
+        self.last_usage: Usage | None = None
+
+    def _record_usage(self, usage: Usage) -> None:
+        self.total_prompt_tokens += usage.prompt_tokens
+        self.total_completion_tokens += usage.completion_tokens
+        self.total_tokens += usage.total_tokens
+        if self.last_usage is None:
+            self.last_usage = Usage()
+        self.last_usage.prompt_tokens += usage.prompt_tokens
+        self.last_usage.completion_tokens += usage.completion_tokens
 
     def _decompose(self, question: str) -> list[str]:
         prompt = (
@@ -219,7 +233,7 @@ class LLMPlanner:
                 temperature=0.0,
                 max_tokens=300,
             )
-            self.total_tokens += response.usage.total_tokens
+            self._record_usage(response.usage)
             data = extract_json(response.content)
             if isinstance(data, dict):
                 raw = data.get("subquestions") or []
@@ -236,6 +250,7 @@ class LLMPlanner:
         ]
 
     def plan(self, state: ResearchState, context: PlannerContext) -> PlannerDecision:
+        self.last_usage = Usage()
         if not state.plan:
             set_plan(state, self._decompose(state.question))
         read_doc_ids = sorted(
@@ -285,7 +300,7 @@ class LLMPlanner:
                 temperature=0.0,
                 max_tokens=900,
             )
-            self.total_tokens += response.usage.total_tokens
+            self._record_usage(response.usage)
             data = extract_json(response.content)
             decision = PlannerDecision.model_validate(data)
             self.last_error = None

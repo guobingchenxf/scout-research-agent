@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..llm import ChatModel, LLMError, extract_json
+from ..llm import ChatModel, LLMError, Usage, extract_json
 from ..models import Citation, Claim, Conflict, Evidence, Report, ResearchState
 from .report import build_report, render_markdown
 from .state import covered_ratio
@@ -17,6 +17,17 @@ Return JSON:
 {"answer": "...", "claims": [{"text": "...", "citations": [{"doc_id": "...", "quote": "..."}]}],
  "conflicts": [{"claim_a": "...", "claim_b": "...", "reason": "..."}],
  "gaps": [{"subquestion_id": "...", "reason": "..."}], "confidence": 0.0}
+"""
+
+PROCEDURE_PROMPT = """You are Scout's procedure synthesizer.
+Answer with an ordered procedure: numbered steps, each grounded in the evidence.
+Every step must cite a doc_id from the evidence. Preserve the order and
+conditions from the sources; do not invent steps.
+Prefer a best-supported answer even when the evidence is partial; use
+INSUFFICIENT_EVIDENCE only when no evidence is relevant.
+Return JSON:
+{"answer": "...", "claims": [{"text": "...", "citations": [{"doc_id": "...", "quote": "..."}]}],
+ "conflicts": [], "gaps": [{"subquestion_id": "...", "reason": "..."}], "confidence": 0.0}
 """
 
 SYNTHESIS_PROMPT = """You are Scout's synthesizer.
@@ -36,6 +47,13 @@ class Synthesizer:
         self.llm = llm
         self.model = model
         self.total_tokens = 0
+        self.total_prompt_tokens = 0
+        self.total_completion_tokens = 0
+
+    def _record_usage(self, usage: Usage) -> None:
+        self.total_prompt_tokens += usage.prompt_tokens
+        self.total_completion_tokens += usage.completion_tokens
+        self.total_tokens += usage.total_tokens
 
     def synthesize(self, state: ResearchState, system_prompt: str | None = None) -> Report:
         evidence = state.evidence_board[:10]
@@ -59,7 +77,7 @@ class Synthesizer:
                 temperature=0.0,
                 max_tokens=2500,
             )
-            self.total_tokens += response.usage.total_tokens
+            self._record_usage(response.usage)
             data = extract_json(response.content)
             report = self._report_from_payload(data, state)
             if report is not None:

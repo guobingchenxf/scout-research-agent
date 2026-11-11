@@ -44,6 +44,10 @@ def test_health_and_run_endpoints(tmp_path) -> None:
         assert events.status_code == 200
         assert isinstance(events.json(), list)
 
+        trace = client.get(f"/v1/runs/{payload['run_id']}/trace/view")
+        assert trace.status_code == 200
+        assert "Scout trace" in trace.text or "run" in trace.text
+
 
 def test_auth_required(tmp_path) -> None:
     app = create_app(

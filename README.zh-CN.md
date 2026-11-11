@@ -240,7 +240,14 @@ python -m scout.cli eval --system scout --planner mock \
 # Live Scout（DeepSeek flash）；full 50 约 35–45 分钟，~1.37M tokens
 python -m scout.cli eval --system scout --planner deepseek \
   --out reports/eval_scout_deepseek_full.md
+
+# 只跑 20 题 held-out
+python -m scout.cli eval --system scout --planner deepseek --split heldout \
+  --out reports/eval_heldout.md
 ```
+
+每次评测同时写 `.json` summary 和 `.details.json` 逐题结果；
+`--split dev|heldout|all` 用于把 prompt 调优和 held-out 分开。
 
 报告写到 `reports/`，包含 Markdown + JSON summary；前端评测面板读取 JSON。
 
@@ -342,6 +349,7 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端测�
 ## 文档
 
 - [设计](docs/DESIGN.md)
+- [API](docs/API.md)
 - [安全](docs/SECURITY.md)
 - [评测](docs/EVALUATION.md)
 - [阶段与交付记录](docs/PHASES.md)

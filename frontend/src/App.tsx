@@ -23,9 +23,14 @@ const NAV: Array<{ key: View; label: string; requiresRun?: boolean }> = [
   { key: "sources", label: "来源/策略" },
 ];
 
+const INITIAL_PARAMS = new URLSearchParams(window.location.search);
+
 export default function App() {
-  const [view, setView] = useState<View>("task");
-  const [runId, setRunId] = useState<string | null>(null);
+  const initialView = INITIAL_PARAMS.get("view") as View | null;
+  const [view, setView] = useState<View>(
+    initialView && NAV.some((item) => item.key === initialView) ? initialView : "task",
+  );
+  const [runId, setRunId] = useState<string | null>(INITIAL_PARAMS.get("run"));
   const [run, setRun] = useState<RunRecord | null>(null);
   const [events, setEvents] = useState<EventRecord[]>([]);
   const [busy, setBusy] = useState(false);

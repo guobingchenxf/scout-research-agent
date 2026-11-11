@@ -17,7 +17,7 @@ from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -39,6 +39,7 @@ from .policy.types import Capability
 from .retrieval import build_index_from_store
 from .sandbox.python_sandbox import make_sandbox
 from .storage import SQLiteStore
+from .viewer import render_trace_html
 
 
 class RunRequest(BaseModel):
@@ -223,6 +224,13 @@ def create_app(config: ScoutConfig | None = None) -> FastAPI:
     @app.get("/v1/runs/{run_id}/events")
     def get_events(run_id: str) -> list[dict[str, Any]]:
         return [event.model_dump(mode="json") for event in store.list_events(run_id)]
+
+    @app.get("/v1/runs/{run_id}/trace/view", response_class=HTMLResponse)
+    def trace_view(run_id: str) -> HTMLResponse:
+        run = store.get_run(run_id)
+        if run is None:
+            raise HTTPException(status_code=404, detail="run not found")
+        return HTMLResponse(render_trace_html(store.list_events(run_id), run))
 
     @app.get("/v1/runs/{run_id}/events/stream")
     def stream_events(run_id: str) -> StreamingResponse:

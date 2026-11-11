@@ -258,6 +258,7 @@ def cmd_eval(args: argparse.Namespace, config: ScoutConfig) -> int:
             planner=args.planner,
             limit=args.limit,
             categories=categories or None,
+            split=args.split,
         )
         summary = runner.summary(results)
         report = render_markdown(
@@ -277,8 +278,18 @@ def cmd_eval(args: argparse.Namespace, config: ScoutConfig) -> int:
                 {
                     "system": args.system,
                     "planner": args.planner,
+                    "split": args.split,
                     "summary": summary,
                 },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        details_path = out_path.with_suffix(".details.json")
+        details_path.write_text(
+            json.dumps(
+                [result.model_dump(mode="json") for result in results],
                 ensure_ascii=False,
                 indent=2,
             ),
@@ -289,9 +300,11 @@ def cmd_eval(args: argparse.Namespace, config: ScoutConfig) -> int:
                 "ok": True,
                 "system": args.system,
                 "planner": args.planner,
+                "split": args.split,
                 "summary": summary,
                 "report": str(out_path),
                 "summary_json": str(summary_path),
+                "details_json": str(details_path),
                 "issues": issues,
             }
         )
@@ -399,6 +412,7 @@ def build_parser() -> argparse.ArgumentParser:
     eval_parser.add_argument("--planner", default="mock", choices=["mock", "deepseek"])
     eval_parser.add_argument("--limit", type=int, default=None)
     eval_parser.add_argument("--category", default="")
+    eval_parser.add_argument("--split", default="all", choices=["all", "dev", "heldout"])
     eval_parser.add_argument("--out", default="reports/eval.md")
     eval_parser.add_argument("--allow-invalid", action="store_true")
     eval_parser.set_defaults(func=cmd_eval)
