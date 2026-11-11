@@ -245,12 +245,15 @@ A/B 交换顺序测；长度偏差用 padding 对照。
 cd D:\scout
 python scripts/make_calibration.py \
   --details reports/eval_heldout_seed1.details.json
-# 生成三个文件：
+# 生成四个文件：
 #   eval/calibration.csv         rule verdict + 空白 human_pass
 #   eval/calibration_labels.csv  只含 task_id/human_pass/notes，便于填写
 #   eval/calibration_review.md   盲标表：question + gold answer + model answer，
 #                                刻意不含 rule/judge verdict
-# 阅读 review，把 pass/fail 填进 labels.csv（不要先看 calibration.csv 的 rule 列）
+#   eval/calibration_review.html 可点击盲标页：浏览器打开，点 pass/fail，
+#                                自动下载 labels.csv
+# 打开 HTML，逐题点 pass/fail（选择保存在浏览器 localStorage），
+# 点“下载 calibration_labels.csv”替换同名文件，然后：
 python scripts/calibrate.py \
   --csv eval/calibration.csv --labels eval/calibration_labels.csv
 ```
@@ -288,12 +291,14 @@ DeepSeek flash，temperature 0，`--split heldout`，20 题：
 
 ### 11.2 人工校准状态
 
-- 已生成三个文件：
+- 已生成四个文件：
   - `eval/calibration.csv`：20 条 held-out 答案，含 rule verdict 和空白
     `human_pass` 列；
   - `eval/calibration_labels.csv`：只含 `task_id/human_pass/notes`，供人工填写；
   - `eval/calibration_review.md`：盲标表（question + gold answer + model
-    answer），不含 rule/judge verdict。
+    answer），不含 rule/judge verdict；
+  - `eval/calibration_review.html`：可点击盲标页，浏览器打开后逐题点
+    pass/fail，自动下载 labels.csv。
 - **kappa 尚未计算**：必须先由人工盲标 `human_pass`（pass/fail），再运行
   `scripts/calibrate.py --labels eval/calibration_labels.csv`。未标注前不要在
   任何材料里声称已完成人工校准。
