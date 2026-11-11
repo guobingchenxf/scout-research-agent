@@ -38,6 +38,11 @@ def main() -> int:
         default="",
         help="optional CSV with task_id,human_pass; overrides the --csv column",
     )
+    parser.add_argument(
+        "--label-column",
+        default="human_pass",
+        help="label column to read (e.g. human_pass or assistant_pass)",
+    )
     args = parser.parse_args()
 
     path = Path(args.csv)
@@ -50,14 +55,14 @@ def main() -> int:
             for label_row in csv.DictReader(handle):
                 task_id = (label_row.get("task_id") or "").strip()
                 if task_id:
-                    labels[task_id] = label_row.get("human_pass") or ""
+                    labels[task_id] = label_row.get(args.label_column) or ""
 
     pairs: list[tuple[bool, bool]] = []
     skipped = 0
     for row in rows:
         rule = _label(row.get("rule_pass", ""))
         task_id = (row.get("task_id") or "").strip()
-        human_value = labels.get(task_id, row.get("human_pass", ""))
+        human_value = labels.get(task_id, row.get(args.label_column, ""))
         human = _label(human_value)
         if rule is None or human is None:
             skipped += 1
@@ -69,6 +74,7 @@ def main() -> int:
         return 1
 
     agreement = sum(1 for rule, human in pairs if rule == human) / len(pairs)
+    print(f"labels: {args.labels or path} [{args.label_column}]")
     print(f"rows: {len(pairs)} (skipped {skipped})")
     print(f"agreement: {agreement:.3f}")
     print(f"cohen_kappa: {cohen_kappa(pairs):.3f}")

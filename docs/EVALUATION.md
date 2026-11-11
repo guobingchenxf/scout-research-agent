@@ -299,8 +299,48 @@ DeepSeek flash，temperature 0，`--split heldout`，20 题：
     answer），不含 rule/judge verdict；
   - `eval/calibration_review.html`：可点击盲标页，浏览器打开后逐题点
     pass/fail，自动下载 labels.csv。
-- **kappa 尚未计算**：必须先由人工盲标 `human_pass`（pass/fail），再运行
-  `scripts/calibrate.py --labels eval/calibration_labels.csv`。未标注前不要在
-  任何材料里声称已完成人工校准。
-- 样本只有 20 条，kappa 的置信区间很宽；报告时要注明样本量和单标注者限制。
+- **人工校准尚未完成**：`human_pass` 仍为空，judge-human kappa 未计算。
+  必须由独立人类标注者盲标后才能声称完成人工校准；assistant 标签不构成
+  人工校准。
+- 样本只有 20 条，kappa 的置信区间很宽；人工完成后报告时要注明样本量和
+  单标注者限制。
+
+### 11.3 Assistant 一致性检查（不是人工校准）
+
+> 这一节用于暴露规则 grader 的问题，**不能**当作 judge-human kappa 报告。
+
+- 方法：由编码助手（Claude）按同一 rubric 对 20 条 held-out answer 做一次
+  adjudication，标签写入 `eval/calibration_assistant.csv`（列名
+  `assistant_pass`），不写入、也不冒充 `human_pass`。
+- 与规则 grader 对比：
+
+| 指标 | 值 |
+|---|---:|
+| 样本 | 20 |
+| 一致率 | 85% |
+| Cohen's kappa | 0.70 |
+| 分歧 | 3/20 |
+
+- 分歧明细：
+  - `cmp_vllm_trtllm`：rule pass / assistant fail。answer 是 README 堆叠，
+    没有给出 vLLM 的 easy/fast/cheap 定位；规则 grader 的 token 覆盖率
+    把重叠词当成了事实覆盖。
+  - `cmp_keepkv_eviction`：rule pass / assistant fail。answer 只截到 KeepKV
+    摘要前半段，没有 merging 优势与 attention 分布结论；同样被 token
+    覆盖率放过。
+  - `conf_scheduler_repro`：rule fail / assistant pass。answer 完整呈现了
+    “部分可移植 + 复现依赖 serving stack”的张力，但规则 grader 的
+    conflict marker 只认 conflict/disagree/contradiction/矛盾/分歧，
+    不认“张力/不能同时”，且 `report.conflicts` 为空。
+- 结论：
+  - 规则 grader 在 raw dump 上偏宽松（token overlap ≠ 事实覆盖）；
+  - conflict 检测偏窄，应补充语义 marker 或 LLM judge；
+  - **assistant 标签不能替代人工校准**：模型给模型打分不独立，kappa
+    无法解释为 judge-human 一致性。对外只能写成 assistant sanity check。
+- 复现：
+
+```bash
+python scripts/calibrate.py --csv eval/calibration.csv \
+  --labels eval/calibration_assistant.csv --label-column assistant_pass
+```
 

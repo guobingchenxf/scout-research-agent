@@ -1,0 +1,21 @@
+task_id,assistant_pass,notes
+fact_trtllm_kernels,pass,README 正文含 specialized kernels / efficient runtime / Pythonic framework；required citation 在 run 报告中匹配
+fact_tamarin_tiers,fail,过度弃权：只回 INSUFFICIENT_EVIDENCE，gold 的三层结构未覆盖
+fact_secrag_dimensions,pass,7 个评估维度齐全；citation 在 run 报告中匹配
+hop_vllm_vs_sglang,fail,answer 为文档堆叠，未回答 PagedAttention vs RadixAttention；缺 required citation docs:github:vllm-project/vllm
+hop_keepkv_vs_tamarin,fail,仅堆叠摘要，未说明 adaptive merging 与三层可逆压缩的取舍
+hop_query_decomp_rerank,fail,仅堆叠摘要，未说明 decomposition 与 cross-encoder reranking 各自解决什么
+hop_rerank_followup,fail,明确称证据不足，未给出 follow-up queries 与初始 query 融合的具体机制
+hop_harness_taxonomy,pass,benchmark / agent / tool-use 三类齐全；citation 匹配
+hop_scheduler_portability,fail,仅堆叠摘要，未给出 Kendall tau 1.0 / 0.55 的结论
+cmp_vllm_trtllm,fail,仅堆叠 README，未给出 vLLM easy/fast/cheap 定位与两者对比
+cmp_keepkv_eviction,fail,仅堆叠摘要，未明确 KeepKV merging 的优势与 attention 分布问题
+cmp_candidate_rerank,fail,仅堆叠摘要，未给出 trajectory/lexical/event-entity 特征与 answer-frequency 的对比
+cmp_governance_auth,fail,过度弃权：gold 有 0.7% vs 0.4%、P=0.6875，answer 称无法判断
+proc_tamarin,fail,过度弃权：gold 有三层细节（L1/L2/L3），answer 称摘要未列出
+proc_secrag,pass,query/retrieval/generation 三阶段监控与多维指标完整
+conf_scheduler_repro,pass,明确呈现可移植性与 serving stack 复现性之间的张力
+conf_context_strategy,pass,正确拒绝选出单一最优并列出三种策略；取舍细节略弱
+abs_sglang_acquisition,pass,正确弃权
+abs_h200_memory,pass,正确弃权
+abs_nobel,pass,正确弃权
