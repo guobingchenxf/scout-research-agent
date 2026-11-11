@@ -354,7 +354,7 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端测�
 - **Conflict** 2/5：多源观点冲突仍依赖 prompt + 小启发式。
 - **成本/延迟**：每任务约 27k tokens、p50 约 40s；有一个 comparison 题长尾重试（分类 p95 ~659s）。
 - **fastembed** 已安装测试但不设默认：CPU 建索引慢，中文 query 排序在该语料上不稳定。
-- **人工 judge 校准尚未完成。** 盲标材料在 `eval/`；另有一份 assistant-only 一致性检查（85% 一致、kappa 0.70），见 `docs/EVALUATION.md` §11.3，明确不是人工标注。
+- **校准状态：** 已执行 assistant adjudication 一致性检查（20 条 held-out，85% 一致、kappa 0.70）；**人工 judge 校准仍未完成**，因此不要报告 judge-human kappa。详见 `docs/EVALUATION.md` §11.3。
 - Docker 本地验证通过；GitHub Actions 会跑 backend/frontend/docker 三个 job；GUI 和真实 MCP server 未做 live 验证。
 - `SCOUT_SANDBOX_BACKEND=subprocess` 是弱隔离；强边界请用 `docker`。
 

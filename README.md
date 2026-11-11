@@ -401,9 +401,10 @@ backend tests + lint, frontend build, Docker build.
   long retry outlier (category p95 ~659s).
 - **fastembed** is installed and tested but not default: CPU index build is slow
   and its Chinese-query ranking was mixed on this corpus.
-- **Human judge calibration is not complete.** Blind review artifacts are in
-  `eval/`; an assistant-only sanity check (85% agreement, kappa 0.70) is
-  documented in `docs/EVALUATION.md` §11.3 and is explicitly not human labeling.
+- **Calibration status:** an assistant adjudication sanity check has been run
+  (20 held-out items, 85% agreement, kappa 0.70); **human judge calibration is
+  still pending**, so do not report a judge-human kappa. See
+  `docs/EVALUATION.md` §11.3.
 - Docker is verified locally; the GitHub Actions workflow runs backend,
   frontend and docker jobs. GUI and real MCP servers are not exercised live.
 - `SCOUT_SANDBOX_BACKEND=subprocess` is weak isolation; use `docker` for the

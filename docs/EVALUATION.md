@@ -305,9 +305,11 @@ DeepSeek flash，temperature 0，`--split heldout`，20 题：
 - 样本只有 20 条，kappa 的置信区间很宽；人工完成后报告时要注明样本量和
   单标注者限制。
 
-### 11.3 Assistant 一致性检查（不是人工校准）
+### 11.3 校准执行记录：Assistant adjudication（非人工）
 
-> 这一节用于暴露规则 grader 的问题，**不能**当作 judge-human kappa 报告。
+> **校准已执行**：20 条 held-out，assistant adjudication，一致率 85%，
+> Cohen's kappa 0.70。**人工校准仍未完成**；两者不可混用，也不能把本节
+> 当作 judge-human kappa 报告。
 
 - 方法：由编码助手（Claude）按同一 rubric 对 20 条 held-out answer 做一次
   adjudication，标签写入 `eval/calibration_assistant.csv`（列名
