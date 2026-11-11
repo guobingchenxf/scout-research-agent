@@ -33,17 +33,32 @@ def cohen_kappa(pairs: list[tuple[bool, bool]]) -> float:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--csv", default="eval/calibration.csv")
+    parser.add_argument(
+        "--labels",
+        default="",
+        help="optional CSV with task_id,human_pass; overrides the --csv column",
+    )
     args = parser.parse_args()
 
     path = Path(args.csv)
     with path.open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
 
+    labels: dict[str, str] = {}
+    if args.labels:
+        with Path(args.labels).open(encoding="utf-8-sig", newline="") as handle:
+            for label_row in csv.DictReader(handle):
+                task_id = (label_row.get("task_id") or "").strip()
+                if task_id:
+                    labels[task_id] = label_row.get("human_pass") or ""
+
     pairs: list[tuple[bool, bool]] = []
     skipped = 0
     for row in rows:
         rule = _label(row.get("rule_pass", ""))
-        human = _label(row.get("human_pass", ""))
+        task_id = (row.get("task_id") or "").strip()
+        human_value = labels.get(task_id, row.get("human_pass", ""))
+        human = _label(human_value)
         if rule is None or human is None:
             skipped += 1
             continue

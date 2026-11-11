@@ -244,10 +244,15 @@ A/B 交换顺序测；长度偏差用 padding 对照。
 ```bash
 cd D:\scout
 python scripts/make_calibration.py \
-  --details reports/eval_heldout_seed1.details.json \
-  --out eval/calibration.csv
-# 人工把 human_pass 填成 pass/fail
-python scripts/calibrate.py --csv eval/calibration.csv
+  --details reports/eval_heldout_seed1.details.json
+# 生成三个文件：
+#   eval/calibration.csv         rule verdict + 空白 human_pass
+#   eval/calibration_labels.csv  只含 task_id/human_pass/notes，便于填写
+#   eval/calibration_review.md   盲标表：question + gold answer + model answer，
+#                                刻意不含 rule/judge verdict
+# 阅读 review，把 pass/fail 填进 labels.csv（不要先看 calibration.csv 的 rule 列）
+python scripts/calibrate.py \
+  --csv eval/calibration.csv --labels eval/calibration_labels.csv
 ```
 
 - `calibrate.py` 输出 rule-grader 与人工标签的一致率和 Cohen's kappa。
@@ -283,8 +288,14 @@ DeepSeek flash，temperature 0，`--split heldout`，20 题：
 
 ### 11.2 人工校准状态
 
-- 已生成 `eval/calibration.csv`：20 条 held-out 答案，含 rule verdict 和空白
-  `human_pass` 列。
+- 已生成三个文件：
+  - `eval/calibration.csv`：20 条 held-out 答案，含 rule verdict 和空白
+    `human_pass` 列；
+  - `eval/calibration_labels.csv`：只含 `task_id/human_pass/notes`，供人工填写；
+  - `eval/calibration_review.md`：盲标表（question + gold answer + model
+    answer），不含 rule/judge verdict。
 - **kappa 尚未计算**：必须先由人工盲标 `human_pass`（pass/fail），再运行
-  `scripts/calibrate.py`。未标注前不要在任何材料里声称已完成人工校准。
+  `scripts/calibrate.py --labels eval/calibration_labels.csv`。未标注前不要在
+  任何材料里声称已完成人工校准。
+- 样本只有 20 条，kappa 的置信区间很宽；报告时要注明样本量和单标注者限制。
 
