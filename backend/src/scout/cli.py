@@ -9,7 +9,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from .acquisition.router import AcquisitionRouter
+from .acquisition.factory import build_acquisition_router
 from .agent.loop import AgentLoop
 from .agent.planner import LLMPlanner, MockPlanner, Planner
 from .agent.reflector import Reflector
@@ -157,7 +157,7 @@ def cmd_baseline(args: argparse.Namespace, config: ScoutConfig) -> int:
 
 def cmd_run(args: argparse.Namespace, config: ScoutConfig) -> int:
     store = _store(config)
-    router = AcquisitionRouter(config)
+    router = build_acquisition_router(config)
     try:
         index = _index(config, store)
         if not index.chunks:

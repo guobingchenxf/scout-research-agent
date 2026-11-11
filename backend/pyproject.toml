@@ -51,6 +51,10 @@ warn_unused_ignores = true
 module = ["fastembed.*"]
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = ["playwright.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

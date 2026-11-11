@@ -6,7 +6,7 @@ import re
 import time
 from dataclasses import dataclass, field
 
-from ..acquisition.router import AcquisitionRouter
+from ..acquisition.factory import build_acquisition_router
 from ..agent.loop import AgentLoop
 from ..agent.planner import LLMPlanner, MockPlanner, Planner
 from ..agent.reflector import Reflector
@@ -75,7 +75,7 @@ def build_tools(config: ScoutConfig, store: SQLiteStore, index: HybridIndex) -> 
         ToolContext(
             store=store,
             index=index,
-            router=AcquisitionRouter(config),
+            router=build_acquisition_router(config),
             human=human,
             python_runner=make_sandbox(
                 config.sandbox_backend,

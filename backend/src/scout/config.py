@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -79,6 +80,23 @@ def _split_models(value: str) -> tuple[str, ...]:
     return items or ("deepseek-flash",)
 
 
+def _split_csv(value: str) -> tuple[str, ...]:
+    return tuple(item.strip() for item in value.split(",") if item.strip())
+
+
+def _env_json_list(name: str) -> tuple[str, ...]:
+    raw = _env_str(name)
+    if not raw:
+        return ()
+    try:
+        value = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"{name} must be a JSON array of strings") from exc
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        raise ValueError(f"{name} must be a JSON array of strings")
+    return tuple(value)
+
+
 @dataclass(frozen=True)
 class ScoutConfig:
     """Runtime configuration.
@@ -130,6 +148,15 @@ class ScoutConfig:
     api_key: str = ""
     source_allowlist: tuple[str, ...] = DEFAULT_ALLOWLIST
 
+    # Acquisition paths. All are opt-in: the default service stays offline.
+    mcp_command: str = ""
+    mcp_args: tuple[str, ...] = ()
+    mcp_timeout_seconds: float = 30.0
+    rpa_enabled: bool = False
+    gui_enabled: bool = False
+    gui_allowed_hosts: tuple[str, ...] = ()
+    gui_browser_channel: str = ""
+
     @classmethod
     def from_env(cls, env_file: Path | None = None) -> ScoutConfig:
         load_dotenv(env_file or PROJECT_ROOT / ".env", override=False)
@@ -178,6 +205,13 @@ class ScoutConfig:
             require_auth=_env_bool("SCOUT_REQUIRE_AUTH", False),
             api_key=_env_str("SCOUT_API_KEY"),
             source_allowlist=allowlist,
+            mcp_command=_env_str("SCOUT_MCP_COMMAND"),
+            mcp_args=_env_json_list("SCOUT_MCP_ARGS"),
+            mcp_timeout_seconds=_env_float("SCOUT_MCP_TIMEOUT_SECONDS", 30.0),
+            rpa_enabled=_env_bool("SCOUT_RPA_ENABLED", False),
+            gui_enabled=_env_bool("SCOUT_GUI_ENABLED", False),
+            gui_allowed_hosts=_split_csv(_env_str("SCOUT_GUI_ALLOWED_HOSTS")),
+            gui_browser_channel=_env_str("SCOUT_GUI_BROWSER_CHANNEL"),
         )
 
     def with_overrides(self, **kwargs: object) -> ScoutConfig:
@@ -212,6 +246,9 @@ class ScoutConfig:
             "allow_http_local": self.allow_http_local,
             "sandbox_backend": self.sandbox_backend,
             "source_allowlist": list(self.source_allowlist),
+            "mcp_enabled": bool(self.mcp_command),
+            "rpa_enabled": self.rpa_enabled,
+            "gui_enabled": self.gui_enabled,
             "require_auth": self.require_auth,
             "api_key_configured": bool(self.deepseek_api_key),
         }

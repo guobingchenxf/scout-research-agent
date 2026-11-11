@@ -61,10 +61,12 @@ class PlaywrightGuiReader:
         timeout_ms: int = 20_000,
         max_chars: int = 20_000,
         allowed_hosts: set[str] | None = None,
+        channel: str | None = None,
     ) -> None:
         self.timeout_ms = timeout_ms
         self.max_chars = max_chars
         self.allowed_hosts = {host.lower() for host in (allowed_hosts or set())}
+        self.channel = channel or None
 
     def read(self, url: str) -> SourceDocument | None:
         parsed = urlparse(url)
@@ -73,7 +75,7 @@ class PlaywrightGuiReader:
         if self.allowed_hosts and (parsed.hostname or "").lower() not in self.allowed_hosts:
             raise GuiError(f"host is not allowed for GUI fallback: {parsed.hostname}")
         try:
-            from playwright.sync_api import sync_playwright  # type: ignore[import-not-found]
+            from playwright.sync_api import sync_playwright
         except ImportError as exc:
             raise GuiError(
                 "playwright is not installed; run `pip install -e '.[gui]'` "
@@ -81,7 +83,9 @@ class PlaywrightGuiReader:
             ) from exc
 
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(headless=True)
+            browser = playwright.chromium.launch(
+                headless=True, channel=self.channel
+            )
             try:
                 context = browser.new_context(
                     accept_downloads=False,

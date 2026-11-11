@@ -21,7 +21,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from .acquisition.router import AcquisitionRouter
+from .acquisition.factory import build_acquisition_router
 from .agent.loop import AgentLoop
 from .agent.planner import LLMPlanner, MockPlanner, Planner
 from .agent.reflector import Reflector
@@ -64,7 +64,7 @@ def create_app(config: ScoutConfig | None = None) -> FastAPI:
         embedding_model=config.embedding_model,
         embedding_dim=config.embedding_dim,
     )
-    router = AcquisitionRouter(config)
+    router = build_acquisition_router(config)
     reflector = Reflector(store)
     allowlist = AllowlistPolicy(
         config.source_allowlist,

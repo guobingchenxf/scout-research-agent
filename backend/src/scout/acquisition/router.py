@@ -121,7 +121,7 @@ class AcquisitionRouter:
                 except Exception as exc:  # noqa: BLE001
                     errors.append(f"mcp:{tool}: {exc}")
                     continue
-                documents = self._documents_from_mcp(output)
+                documents = self._documents_from_mcp(output, fallback_url=source_ref)
                 if documents:
                     return AcquisitionResult(
                         documents=documents,
@@ -161,7 +161,7 @@ class AcquisitionRouter:
             close = getattr(source, "close", None)
             if callable(close):
                 close()
-        for client in (self.mcp_client, self.gui_reader):
+        for client in (self.mcp_client, self.rpa_runner, self.gui_reader):
             close = getattr(client, "close", None)
             if callable(close):
                 close()
@@ -180,7 +180,9 @@ class AcquisitionRouter:
         wanted = {str(item) for item in sources}
         return [doc for doc in documents if doc.source_type.value in wanted]
 
-    def _documents_from_mcp(self, output: Any) -> list[SourceDocument]:
+    def _documents_from_mcp(
+        self, output: Any, *, fallback_url: str = ""
+    ) -> list[SourceDocument]:
         if isinstance(output, SourceDocument):
             return [output]
         if isinstance(output, dict):
@@ -197,7 +199,7 @@ class AcquisitionRouter:
                     for item in text
                 )
             if text:
-                url = str(output.get("url") or "")
+                url = str(output.get("url") or fallback_url)
                 title = str(output.get("title") or url or "MCP result")
                 body = f"# {title}\n\nSource: {url}\n\n{text}\n"
                 return [
@@ -215,6 +217,8 @@ class AcquisitionRouter:
         if isinstance(output, list):
             documents: list[SourceDocument] = []
             for item in output:
-                documents.extend(self._documents_from_mcp(item))
+                documents.extend(
+                    self._documents_from_mcp(item, fallback_url=fallback_url)
+                )
             return documents
         return []

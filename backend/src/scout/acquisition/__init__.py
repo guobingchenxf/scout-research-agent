@@ -8,6 +8,7 @@ from .api_sources import (
     HuggingFaceMirrorSource,
     default_api_sources,
 )
+from .factory import build_acquisition_router
 from .router import AcquisitionRouter
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     "DocsApiSource",
     "GitHubApiSource",
     "HuggingFaceMirrorSource",
+    "build_acquisition_router",
     "default_api_sources",
 ]

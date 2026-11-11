@@ -2,7 +2,7 @@
 
 **A citation-first AI technology research agent.**
 
-[![tests](https://img.shields.io/badge/tests-102%20passing-2ea44f)](#testing)
+[![tests](https://img.shields.io/badge/tests-107%20passing-2ea44f)](#testing)
 [![python](https://img.shields.io/badge/python-3.10-3776AB)](#quickstart)
 [![fastapi](https://img.shields.io/badge/FastAPI-0.162-009688)](#architecture)
 [![react](https://img.shields.io/badge/React-19-61DAFB)](#frontend)
@@ -25,7 +25,7 @@ reproducible, and every action must stay inside a capability boundary.*
 
 > A 3-minute walkthrough and talk track: [`docs/DEMO.md`](docs/DEMO.md).
 
-> **Status:** 102 tests · 36 security cases · 50-task evaluation · Docker
+> **Status:** 107 tests · 36 security cases · 50-task evaluation · Docker
 > one-command deploy. Full 50 live evaluation (DeepSeek flash):
 > **Scout 28/50 (56%) vs single-shot RAG 18/50 (36%)**.
 > See [`docs/PHASES.md`](docs/PHASES.md) for the delivery log.
@@ -121,6 +121,10 @@ API adapter → MCP tool → RPA workflow → read-only GUI fallback
 - **API/MCP** for structured sources (Crossref, GitHub, HuggingFace, docs);
 - **RPA** for stable repeated workflows;
 - **GUI** only as a last resort, read-only: no clicks, no forms, no login.
+
+All four paths are live-verified against real services — a real MCP fetch server
+over stdio, the GitHub RPA workflow, and headless Edge for the GUI fallback. See
+[`docs/LIVE_ACQUISITION.md`](docs/LIVE_ACQUISITION.md).
 
 Every source carries `source_type`, `trust`, `retrieval_method`, `content_hash`
 and a policy verdict.
@@ -364,7 +368,7 @@ reports/            eval reports (generated)
 
 ```bash
 cd D:\scout\backend
-pytest -q          # 102 tests
+pytest -q          # 107 tests
 ruff check src tests
 mypy src/scout
 ```
@@ -378,7 +382,7 @@ backend tests + lint, frontend build, Docker build.
 
 - Built **Scout**, a citation-first AI research agent: FastAPI + React/SSE +
   SQLite, five tools, evidence board, capability policy, hash-chained audit;
-  **102 tests** and **36 security cases** pass.
+  **107 tests** and **36 security cases** pass.
 - Designed hybrid acquisition routing **API → MCP → RPA → read-only GUI** with
   SSRF/allowlist, prompt-injection marking, Docker sandbox boundary and HITL.
 - Built a **50-task** evaluation set (fact / multi-hop / comparison / procedure /
@@ -406,7 +410,9 @@ backend tests + lint, frontend build, Docker build.
   still pending**, so do not report a judge-human kappa. See
   `docs/EVALUATION.md` §11.3.
 - Docker is verified locally; the GitHub Actions workflow runs backend,
-  frontend and docker jobs. GUI and real MCP servers are not exercised live.
+  frontend and docker jobs. A real MCP fetch server, the GitHub RPA workflow
+  and the read-only GUI fallback are live-verified (`docs/LIVE_ACQUISITION.md`);
+  open-ended MCP search and logged-in/paginated GUI flows are not covered.
 - `SCOUT_SANDBOX_BACKEND=subprocess` is weak isolation; use `docker` for the
   strong boundary.
 
@@ -415,9 +421,10 @@ backend tests + lint, frontend build, Docker build.
 ## Roadmap
 
 - [ ] Improve procedure synthesis and conflict coverage.
-- [ ] Run full 50 live with multiple seeds and publish variance.
+- [ ] Held-out 20 × 2 seeds is done; full 50 multi-seed still pending.
 - [ ] Add fastembed index caching + title/entity reranking.
-- [ ] Connect a real MCP server and exercise the GUI fallback in CI.
+- [x] Connect a real MCP fetch server, RPA workflow and read-only GUI fallback.
+- [ ] Exercise the GUI fallback smoke test in CI (needs a chromium download).
 - [ ] Ed25519 attestations + external audit anchoring.
 - [ ] Remote CI green + a Docker smoke test in CI.
 

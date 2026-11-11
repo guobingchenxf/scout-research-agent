@@ -2,7 +2,7 @@
 
 **一个 citation-first 的 AI 技术调研 Agent。**
 
-[![tests](https://img.shields.io/badge/tests-102%20passing-2ea44f)](#测试)
+[![tests](https://img.shields.io/badge/tests-107%20passing-2ea44f)](#测试)
 [![python](https://img.shields.io/badge/python-3.10-3776AB)](#快速开始)
 [![fastapi](https://img.shields.io/badge/FastAPI-0.162-009688)](#架构)
 [![react](https://img.shields.io/badge/React-19-61DAFB)](#前端)
@@ -21,7 +21,7 @@ Scout 在一个冻结的 AI / Agent / RecSys 语料上回答技术调研问题�
 
 > 3 分钟演示脚本和讲解词：[`docs/DEMO.md`](docs/DEMO.md)。
 
-> **状态：** 102 tests · 36 security cases · 50 题评测 · Docker 一条命令部署。
+> **状态：** 107 tests · 36 security cases · 50 题评测 · Docker 一条命令部署。
 > Full 50 live（DeepSeek flash）：**Scout 28/50（56%）vs single-shot RAG 18/50（36%）**。
 > 交付记录见 [`docs/PHASES.md`](docs/PHASES.md)。
 
@@ -107,6 +107,8 @@ API adapter → MCP tool → RPA workflow → read-only GUI fallback
 - **API/MCP**：Crossref、GitHub、HuggingFace、官方文档等结构化来源；
 - **RPA**：稳定、重复的固定流程；
 - **GUI**：最后兜底，只读——不点击、不填表、不登录。
+
+四条路径都已对真实服务做过 live 验证：真实 MCP fetch server、GitHub RPA workflow、headless Edge GUI fallback。见 [`docs/LIVE_ACQUISITION.md`](docs/LIVE_ACQUISITION.md)。
 
 每条来源都记录 `source_type`、`trust`、`retrieval_method`、`content_hash` 和 policy verdict。
 
@@ -330,7 +332,7 @@ reports/            评测报告（生成）
 
 ```bash
 cd D:\scout\backend
-pytest -q          # 102 tests
+pytest -q          # 107 tests
 ruff check src tests
 mypy src/scout
 ```
@@ -341,7 +343,7 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端测�
 
 ## 简历 bullet（实测数字）
 
-- 构建 **Scout**，一个 citation-first 的 AI 技术调研 Agent：FastAPI + React/SSE + SQLite、5 个工具、证据板、capability policy、哈希链审计；**102 tests**、**36 security cases** 通过。
+- 构建 **Scout**，一个 citation-first 的 AI 技术调研 Agent：FastAPI + React/SSE + SQLite、5 个工具、证据板、capability policy、哈希链审计；**107 tests**、**36 security cases** 通过。
 - 设计混合获取路由 **API → MCP → RPA → read-only GUI**，包含 SSRF/allowlist、prompt-injection 标记、Docker 沙箱边界和 HITL。
 - 构建 **50 题**评测集（fact / multi-hop / comparison / procedure / conflict / abstention），规则 + LLM grader + baseline；full live Scout **28/50（56%）vs RAG 18/50（36%）**，comparison（7/10 vs 3/10）、abstention（4/5 vs 0/5）、conflict（2/5 vs 0/5）、multi-hop（7/15 vs 6/15）更好。
 - 交付完整 React + FastAPI 产品：实时 SSE 时间线、证据板、citation-bound 报告、评测面板、审批页；包含 Dockerfile 和 Compose。
@@ -355,7 +357,7 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端测�
 - **成本/延迟**：每任务约 27k tokens、p50 约 40s；有一个 comparison 题长尾重试（分类 p95 ~659s）。
 - **fastembed** 已安装测试但不设默认：CPU 建索引慢，中文 query 排序在该语料上不稳定。
 - **校准状态：** 已执行 assistant adjudication 一致性检查（20 条 held-out，85% 一致、kappa 0.70）；**人工 judge 校准仍未完成**，因此不要报告 judge-human kappa。详见 `docs/EVALUATION.md` §11.3。
-- Docker 本地验证通过；GitHub Actions 会跑 backend/frontend/docker 三个 job；GUI 和真实 MCP server 未做 live 验证。
+- Docker 本地验证通过；GitHub Actions 会跑 backend/frontend/docker 三个 job。真实 MCP fetch server、GitHub RPA workflow、只读 GUI fallback 已做 live 验证（`docs/LIVE_ACQUISITION.md`）；MCP 开放式 search 和 GUI 登录/分页仍未覆盖。
 - `SCOUT_SANDBOX_BACKEND=subprocess` 是弱隔离；强边界请用 `docker`。
 
 ---
@@ -363,9 +365,10 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端测�
 ## Roadmap
 
 - [ ] 改进 procedure synthesis 和 conflict coverage。
-- [ ] 用多个 seed 跑 full 50 live，并发布方差。
+- [ ] held-out 20 题 × 2 seeds 已完成；full 50 多 seed 仍待做。
 - [ ] 加 fastembed 索引缓存 + title/entity reranking。
-- [ ] 接入真实 MCP server，并在 CI 里跑 GUI fallback。
+- [x] 接入真实 MCP fetch server、RPA workflow 和只读 GUI fallback（live 验证）。
+- [ ] 在 CI 里跑 GUI fallback smoke（需要 chromium 下载）。
 - [ ] Ed25519 attestations + external audit anchoring。
 - [ ] 远程 CI 变绿 + CI 内 Docker smoke。
 

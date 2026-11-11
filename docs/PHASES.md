@@ -268,3 +268,25 @@
     over_answer 1；comparison 有一个长尾重试（category p95 ~659s）
 - 下一步：GitHub Actions 远程未跑；fastembed 需要更快的索引缓存/模型
   选择后再评估；procedure/conflict 仍是弱项。
+
+## P0 收尾（2026-11-11）
+
+- dev/held-out 30/20 切分、Procedure 模式、per-step cost、HTML trace viewer。
+- held-out 20 题 × 2 seeds（DeepSeek flash）：10/20、8/20，
+  均值 **45% ± 5%**，citation **87.5% ± 2.5%**。
+- CI：backend / frontend / docker 三个 job。
+- 截图 + 短录屏：`docs/assets/`，采集脚本 `scripts/capture_demo.py`。
+- `v0.1.0` tag / GitHub Release。
+- 校准：assistant adjudication 一致性检查（85%，κ=0.70）已记录，**不是**
+  人工校准；人工校准仍未完成（`docs/EVALUATION.md` §11.2–11.3）。
+
+## P1 第一块：混合获取 live 验证（2026-11-11）
+
+- 新增 `acquisition/factory.py`：按配置装配 API / MCP / RPA / GUI，默认全关。
+- 新增 `SCOUT_MCP_*`、`SCOUT_RPA_ENABLED`、`SCOUT_GUI_*` 配置。
+- 真实路径验证（`scripts/verify_live_acquisition.py`）：
+  - MCP：官方 `uvx mcp-server-fetch`，stdio JSON-RPC，docs 页 4,589 chars；
+  - RPA：GitHub README workflow，5,864 chars；
+  - GUI：headless Edge，只读提取 3,382 chars；非白名单 host 被拒绝。
+- 详情：`docs/LIVE_ACQUISITION.md`。
+- 回归：107 tests passed；ruff / mypy 通过。
