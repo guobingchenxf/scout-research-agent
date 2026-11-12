@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import type { EventRecord, RunRecord } from "../types";
 import EvidenceBoard from "./EvidenceBoard";
 import Timeline from "./Timeline";
@@ -30,6 +31,9 @@ export default function RunView({ run, events, onRefresh }: Props) {
           </p>
         </div>
         <div className="row">
+          <Link className="button primary" to={`/runs/${run.id}/report`}>
+            查看报告
+          </Link>
           <a
             className="button"
             href={`/v1/runs/${run.id}/trace/view`}
@@ -55,9 +59,13 @@ export default function RunView({ run, events, onRefresh }: Props) {
             <span>gaps <strong>{run.result?.report?.gaps.length ?? 0}</strong></span>
           </div>
           {run.result?.report ? (
-            <p className="muted small">
-              报告已生成，切到“报告”页查看 citation-bound 结果。
-            </p>
+            <>
+              <p className="answer-preview">{run.result.report.answer}</p>
+              <p className="muted small">
+                每个 claim 的 citation 在报告页：{" "}
+                <Link to={`/runs/${run.id}/report`}>查看完整报告 →</Link>
+              </p>
+            </>
           ) : (
             <p className="muted small">报告尚未生成。</p>
           )}
