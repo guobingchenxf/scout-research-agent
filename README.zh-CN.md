@@ -182,6 +182,8 @@ Scout 也是 Engram roadmap 里的 P0 integration：一个使用 memory layer �
 
 **环境要求：** Python 3.10+、Node 22+（前端构建）、Docker Desktop（可选部署）。冻结语料（约 306 篇）已包含在仓库里。
 
+> 完整的运行 / 使用 / 部署手册：[`docs/RUNBOOK.md`](docs/RUNBOOK.md)。
+
 ### Docker（推荐）
 
 ```bash
@@ -391,6 +393,7 @@ CI 定义在 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：后端测�
 
 ## 文档
 
+- [运行 / 使用 / 部署手册](docs/RUNBOOK.md)
 - [设计](docs/DESIGN.md)
 - [API](docs/API.md)
 - [安全](docs/SECURITY.md)

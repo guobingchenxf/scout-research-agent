@@ -207,6 +207,8 @@ using the memory layer.
 **Requirements:** Python 3.10+, Node 22+ (frontend build), Docker Desktop
 (optional deployment). The frozen corpus (~306 documents) is included.
 
+> Full run / use / deploy guide: [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
+
 ### Docker (recommended)
 
 ```bash
@@ -451,6 +453,7 @@ backend tests + lint, frontend build, Docker build.
 
 ## Docs
 
+- [Runbook: run / use / deploy](docs/RUNBOOK.md)
 - [Design](docs/DESIGN.md)
 - [API](docs/API.md)
 - [Security](docs/SECURITY.md)
